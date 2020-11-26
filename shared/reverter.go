@@ -1,0 +1,73 @@
+// -*- Mode: Go; indent-tabs-mode: t -*-
+// AMS - Anbox Management Service
+// Copyright 2018 Canonical Ltd.  All rights reserved.
+
+package shared
+
+import (
+	"context"
+	"log"
+	"time"
+)
+
+const (
+	fullRevertTimeout = time.Second * 5
+)
+
+// RevertFunc describes a function used to revert an operation
+type RevertFunc func(ctx context.Context) error
+
+// Reverter provides functionality to automatically revert a set of executed operations. It
+// can be used this way:
+//
+// r := shared.NewReverter()
+// defer r.Finish()
+//
+// doOperation()
+// r.Add(func(ctx context.Context) error {
+//   revertOperation()
+//   return nil
+// })
+//
+// if err := doOtherOperation(); err != nil {
+//   return err
+// }
+//
+// r.Defuse()
+type Reverter struct {
+	needRevert bool
+	reverters  []RevertFunc
+}
+
+// Add adds a new revert function to the reverter which will be called when Finish() is
+// called unless the reverter gets defused.
+func (r *Reverter) Add(f ...RevertFunc) {
+	r.reverters = append(r.reverters, f...)
+}
+
+// Defuse defuses the reverter. If defused none of the added revert functions will be
+// called when Finish() is invoked.
+func (r *Reverter) Defuse() {
+	r.needRevert = false
+}
+
+// Finish invokes all added revert functions if the reverter was not defused.
+func (r *Reverter) Finish() {
+	if !r.needRevert {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), fullRevertTimeout)
+	defer cancel()
+	// Walk in reverse order through our revertes and call them all
+	for n := range r.reverters {
+		revert := r.reverters[len(r.reverters)-n-1]
+		if err := revert(ctx); err != nil {
+			log.Printf("Failed to revert: %v", err)
+		}
+	}
+}
+
+// NewReverter constructs a new reverter.
+func NewReverter() *Reverter {
+	return &Reverter{needRevert: true}
+}
