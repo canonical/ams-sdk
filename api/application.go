@@ -182,6 +182,13 @@ type ApplicationPatch struct {
 	Addons             *[]string                 `json:"addons" yaml:"addons"`
 	Resources          *ApplicationResourcesPost `json:"resources,omitempty" yaml:"resources,omitempty"`
 	InhibitAutoUpdates *bool                     `json:"inhibit_auto_updates" yaml:"inhibit_auto_updates"`
+	// For application version update, changing those values would trigger a new application version creation
+	Services            *[]ApplicationService `json:"services,omitempty" yaml:"services,omitempty"`
+	Watchdog            *ApplicationWatchdog  `json:"watchdog" yaml:"watchdog"`
+	BootActivity        *string               `json:"boot_activity" yaml:"boot-activity"`
+	RequiredPermissions *[]string             `json:"required_permissions" yaml:"required_permissions"`
+	VideoEncoder        *VideoEncoderType     `json:"video_encoder,omitempty" yaml:"video-encoder,omitempty"`
+	ManifestVersion     *string               `json:"manifest_version" yaml:"manifest-version"`
 }
 
 // ApplicationDelete represents the fields used to delete an application

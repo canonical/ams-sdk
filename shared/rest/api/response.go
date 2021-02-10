@@ -35,14 +35,14 @@ type Response struct {
 	StatusCode int    `json:"status_code" yaml:"status_code"`
 
 	// Valid only for Async responses
-	Operation string `json:"operation" yaml:"operation"`
+	Operation string `json:"operation,omitempty" yaml:"operation,omitempty"`
 
 	// Valid only for Error responses
 	Code  int    `json:"error_code" yaml:"error_code"`
-	Error string `json:"error" yaml:"error"`
+	Error string `json:"error,omitempty" yaml:"error,omitempty"`
 
 	// Valid for Sync and Error responses
-	Metadata json.RawMessage `json:"metadata" yaml:"metadata"`
+	Metadata json.RawMessage `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 }
 
 // MetadataAsMap parses the Response metadata into a map

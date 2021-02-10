@@ -66,9 +66,9 @@ type Operation struct {
 	UpdatedAt     time.Time              `json:"updated_at" yaml:"updated_at"`
 	Status        string                 `json:"status" yaml:"status"`
 	StatusCode    StatusCode             `json:"status_code" yaml:"status_code"`
-	Resources     map[string][]string    `json:"resources" yaml:"resources"`
-	Metadata      map[string]interface{} `json:"metadata" yaml:"metadata"`
+	Resources     map[string][]string    `json:"resources,omitempty" yaml:"resources,omitempty"`
+	Metadata      map[string]interface{} `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 	MayCancel     bool                   `json:"may_cancel" yaml:"may_cancel"`
-	Err           string                 `json:"err" yaml:"err"`
-	ServerAddress string                 `json:"server_address" yaml:"server_address"`
+	Err           string                 `json:"err,omitempty" yaml:"err,omitempty"`
+	ServerAddress string                 `json:"server_address,omitempty" yaml:"server_address,omitempty"`
 }

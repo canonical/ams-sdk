@@ -69,6 +69,8 @@ type Node struct {
 	Tags                 []string   `json:"tags" yaml:"tags"`
 	Unschedulable        bool       `json:"unscheduable" yaml:"unscheduable"`
 	Architecture         string     `json:"architecture,omitempty" yaml:"architecture,omitempty"`
+	StoragePool          string     `json:"storage_pool" yaml:"storage_pool"`
+	Managed              bool       `json:"managed" yaml:"managed"`
 }
 
 // NodesPost describes a request to create a new node on AMS
@@ -86,6 +88,10 @@ type NodesPost struct {
 	GPUSlots             int      `json:"gpu_slots"`
 	GPUEncoderSlots      int      `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
 	Tags                 []string `json:"tags" yaml:"tags"`
+	Unmanaged            bool     `json:"unmanaged" yaml:"unmanaged"`
+	StoragePool          string   `json:"storage_pool" yaml:"storage_pool"`
+	NetworkName          string   `json:"network_name" yaml:"network_name"`
+	NetworkSubnet        string   `json:"network_subnet" yaml:"network_subnet"`
 }
 
 // NodePatch describes a request to update an existing node
