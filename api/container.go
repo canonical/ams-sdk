@@ -199,3 +199,8 @@ type ContainerExecControl struct {
 	Args    map[string]string `json:"args" yaml:"args"`
 	Signal  int               `json:"signal" yaml:"signal"`
 }
+
+// ContainerDelete describes a request used to delete a container
+type ContainerDelete struct {
+	Force bool `json:"force"`
+}

@@ -113,7 +113,7 @@ You can create a custom CA key to sign your own certificates with:
     $ openssl genrsa -out MyCompanyCA.key 2048
 
 That will generate the CA key in a file named `MyCompanyCA.key`. You can now create
-the certificate with
+the certificate with 
 
     $ openssl req -x509 -new -nodes -key MyCompanyCA.key -sha256 -days 1024 -out MyCompanyCA.crt
 
@@ -192,7 +192,7 @@ solution involving a few lines of code:
 
 !!!Note:
     Here, we take any server certificate as valid. In case you want a better compromise
-    on the client side with the server certificate to trust, you simply have to
+    on the client side with the server certificate to trust, you simply have to 
     replace `shared.GetRemoteCertificate(serviceURL)` method with code to read a
     server well-known certificate from a remote or local path to a x509 object and pass
     it to `shared.GetTLSConfig()` method.

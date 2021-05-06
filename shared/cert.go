@@ -5,7 +5,9 @@
 package shared
 
 import (
+	"crypto/sha256"
 	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"net/http"
 	"time"
@@ -15,6 +17,26 @@ const (
 	// DefaultTransportTimeout stands for the default value for client requests to wait for a reply
 	DefaultTransportTimeout = 30 * time.Second
 )
+
+// CertFingerprint returns the sha256 fingerprint of the given x509.Certificate
+func CertFingerprint(cert *x509.Certificate) string {
+	return fmt.Sprintf("%x", sha256.Sum256(cert.Raw))
+}
+
+// CertFingerprintStr decodes the given string to x509.Certificate and then generates a sha256 fingerprint
+func CertFingerprintStr(c string) (string, error) {
+	pemCertificate, _ := pem.Decode([]byte(c))
+	if pemCertificate == nil {
+		return "", fmt.Errorf("invalid certificate")
+	}
+
+	cert, err := x509.ParseCertificate(pemCertificate.Bytes)
+	if err != nil {
+		return "", err
+	}
+
+	return CertFingerprint(cert), nil
+}
 
 // GetRemoteCertificate connects to the server and returns its certificate
 func GetRemoteCertificate(address string) (*x509.Certificate, error) {
@@ -26,11 +48,13 @@ func GetRemoteCertificate(address string) (*x509.Certificate, error) {
 
 	tlsConfig.InsecureSkipVerify = true
 	tr := &http.Transport{
-		TLSClientConfig: tlsConfig,
-		Dial:            RFC3493Dialer,
+		TLSClientConfig:   tlsConfig,
+		Dial:              RFC3493Dialer,
+		DisableKeepAlives: true,
+		IdleConnTimeout:   30 * time.Second,
+		MaxIdleConns:      1,
 	}
 
-	// Connect
 	client := &http.Client{
 		Transport: tr,
 		Timeout:   DefaultTransportTimeout,
@@ -39,10 +63,11 @@ func GetRemoteCertificate(address string) (*x509.Certificate, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	// Retrieve the certificate
 	if resp.TLS == nil || len(resp.TLS.PeerCertificates) == 0 {
-		return nil, fmt.Errorf("Unable to read remote TLS certificate")
+		return nil, fmt.Errorf("unable to read remote TLS certificate")
 	}
 
 	return resp.TLS.PeerCertificates[0], nil

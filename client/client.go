@@ -40,7 +40,7 @@ type Client interface {
 	ListContainers() ([]api.Container, error)
 	LaunchContainer(details *api.ContainersPost) (restclient.Operation, error)
 	RetrieveContainerByID(id string) (*api.Container, string, error)
-	DeleteContainerByID(id string) (restclient.Operation, error)
+	DeleteContainerByID(id string, force bool) (restclient.Operation, error)
 	RetrieveContainerLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error
 	ExecuteContainer(id string, details *api.ContainerExecPost, args *ContainerExecArgs) (restclient.Operation, error)
 

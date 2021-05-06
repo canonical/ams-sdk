@@ -12,9 +12,9 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/gorilla/websocket"
 	"github.com/anbox-cloud/ams-sdk/shared"
 	"github.com/anbox-cloud/ams-sdk/shared/rest/client"
-	"github.com/gorilla/websocket"
 )
 
 func (c *clientImpl) upload(httpOp, apiPath, packagePath string, details interface{}, sentBytes chan float64) (client.Operation, error) {

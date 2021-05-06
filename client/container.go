@@ -10,11 +10,11 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/gorilla/websocket"
 	"github.com/anbox-cloud/ams-sdk/api"
 	"github.com/anbox-cloud/ams-sdk/shared"
 	errs "github.com/anbox-cloud/ams-sdk/shared/errors"
 	"github.com/anbox-cloud/ams-sdk/shared/rest/client"
-	"github.com/gorilla/websocket"
 )
 
 // The ContainerExecArgs struct is used to pass additional options during a
@@ -60,11 +60,20 @@ func (c *clientImpl) RetrieveContainerByID(id string) (*api.Container, string, e
 }
 
 // DeleteContainerByID deletes a single container specified by its id
-func (c *clientImpl) DeleteContainerByID(id string) (client.Operation, error) {
+func (c *clientImpl) DeleteContainerByID(id string, force bool) (client.Operation, error) {
 	if len(id) == 0 {
 		return nil, errs.NewInvalidArgument("id")
 	}
-	op, _, err := c.QueryOperation("DELETE", client.APIPath("containers", id), nil, nil, nil, "")
+
+	details := api.ContainerDelete{
+		Force: force,
+	}
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+
+	op, _, err := c.QueryOperation("DELETE", client.APIPath("containers", id), nil, nil, bytes.NewReader(b), "")
 	return op, err
 }
 
