@@ -90,6 +90,7 @@ type ApplicationVersion struct {
 	VideoEncoder        VideoEncoderType                `json:"video_encoder,omitempty" yaml:"video-encoder,omitempty"`
 	Watchdog            ApplicationWatchdog             `json:"watchdog" yaml:"watchdog"`
 	Services            []ApplicationService            `json:"services,omitempty" yaml:"services,omitempty"`
+	Features            []string                        `json:"features" yaml:"features"`
 }
 
 // ApplicationExtraData represents an extra application data

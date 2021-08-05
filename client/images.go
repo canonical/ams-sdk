@@ -36,6 +36,25 @@ func (c *clientImpl) AddImage(name, packagePath string, isDefault bool, sentByte
 	return c.upload("POST", client.APIPath("images"), packagePath, details, sentBytes)
 }
 
+// ImportImage imports a new image from the image server
+func (c *clientImpl) ImportImage(name, path string, isDefault bool) (client.Operation, error) {
+	details := api.ImagesPost{
+		Name:    name,
+		Path:    path,
+		Default: isDefault,
+	}
+
+	b, err := json.Marshal(&details)
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal request body: %v", err)
+	}
+
+	header := http.Header{"Content-Type": []string{"application/json"}}
+	op, _, err := c.QueryOperation("POST", client.APIPath("images"), nil, header, bytes.NewReader(b), "")
+	return op, err
+
+}
+
 // UpdateImage updates an existing image with the given payload
 func (c *clientImpl) UpdateImage(id, packagePath string, sentBytes chan float64) (client.Operation, error) {
 	details := api.ImagePatch{}
@@ -52,7 +71,7 @@ func (c *clientImpl) SetDefaultImage(id string) error {
 
 	b, err := json.Marshal(details)
 	if err != nil {
-		return fmt.Errorf("Could not marshal request body: %v", err)
+		return fmt.Errorf("could not marshal request body: %v", err)
 	}
 
 	header := http.Header{"Content-Type": []string{"application/json"}}

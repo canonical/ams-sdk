@@ -7,7 +7,8 @@ package api
 // RegistryApplicationVersion describes a version of an application available
 // in the registry
 type RegistryApplicationVersion struct {
-	BootActivity string `json:"boot_activity" yaml:"boot_activity"`
+	BootActivity string   `json:"boot_activity" yaml:"boot_activity"`
+	Features     []string `json:"features"`
 }
 
 // RegistryApplication describes a single application available in the registry

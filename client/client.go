@@ -52,6 +52,7 @@ type Client interface {
 	CreateApplication(packagePath string, sentBytes chan float64) (restclient.Operation, error)
 	UpdateApplicationWithPackage(id, packagePath string, sentBytes chan float64) (restclient.Operation, error)
 	UpdateApplicationWithDetails(id string, details api.ApplicationPatch) error
+	UpdateApplication(id string) (restclient.Operation, error)
 	ListApplications() ([]api.Application, error)
 	FindApplicationsByName(pattern string) ([]api.Application, error)
 	RetrieveApplicationByID(id string) (*api.Application, string, error)
@@ -73,6 +74,7 @@ type Client interface {
 	ListImages() ([]api.Image, error)
 	AddImage(name, packagePath string, isDefault bool, sentBytes chan float64) (restclient.Operation, error)
 	UpdateImage(id, packagePath string, sentBytes chan float64) (restclient.Operation, error)
+	ImportImage(name, path string, isDefault bool) (client.Operation, error)
 	SetDefaultImage(id string) error
 	DeleteImageByIDOrName(id string, force bool) (restclient.Operation, error)
 	DeleteImageVersion(id string, version int) (restclient.Operation, error)

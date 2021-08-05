@@ -67,6 +67,7 @@ type Image struct {
 // ImagesPost represents the fields to upload a new image
 type ImagesPost struct {
 	Name    string `json:"name" yaml:"name"`
+	Path    string `json:"path" yaml:"path"`
 	Default bool   `json:"default" yaml:"default"`
 }
 

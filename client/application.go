@@ -51,6 +51,20 @@ func (c *clientImpl) UpdateApplicationWithPackage(id, packagePath string, sentBy
 	return c.upload("PATCH", client.APIPath("applications", id), packagePath, nil, sentBytes)
 }
 
+// UpdateApplication updates an existing application
+func (c *clientImpl) UpdateApplication(id string) (client.Operation, error) {
+	if len(id) == 0 {
+		return nil, errs.NewInvalidArgument("id")
+	}
+
+	header := http.Header{"Content-Type": []string{"application/json"}}
+	op, _, err := c.QueryOperation("PATCH", client.APIPath("applications", id), nil, header, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	return op, err
+}
+
 // ListApplications lists all available applications the AMS service knows about
 func (c *clientImpl) ListApplications() ([]api.Application, error) {
 	params := client.QueryParams{
