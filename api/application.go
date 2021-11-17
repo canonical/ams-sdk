@@ -4,12 +4,12 @@
  * Copyright 2021 Canonical Ltd.
  *
  * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License version 3, as published
+ * the terms of the Lesser GNU General Public License version 3, as published
  * by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranties of MERCHANTABILITY, SATISFACTORY
- * QUALITY, or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * QUALITY, or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public
  * License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License along
@@ -103,7 +103,7 @@ type ApplicationVersion struct {
 	ErrorMessage        string                          `json:"error_message" yaml:"error_message"`
 	VideoEncoder        VideoEncoderType                `json:"video_encoder,omitempty" yaml:"video-encoder,omitempty"`
 	Watchdog            ApplicationWatchdog             `json:"watchdog" yaml:"watchdog"`
-	Services            []ApplicationService            `json:"services,omitempty" yaml:"services,omitempty"`
+	Services            []NetworkServiceSpec            `json:"services,omitempty" yaml:"services,omitempty"`
 	Features            []string                        `json:"features" yaml:"features"`
 }
 
@@ -124,7 +124,7 @@ type ApplicationResources struct {
 
 // ToApplicationResources returns a valid application resource from an application resource patch
 func (a *ApplicationResourcesPost) ToApplicationResources() ApplicationResources {
-	// NOTE: GPUSlots = 0 is an valid resource option, which means no gpu
+	// NOTE: GPUSlots = 0 is a valid resource option, which means no gpu
 	// slot will be plugged for the container launching from the application
 	resources := ApplicationResources{GPUSlots: -1}
 	if a.CPUs != nil && *a.CPUs > 0 {
@@ -154,14 +154,6 @@ type ApplicationResourcesPost struct {
 type ApplicationWatchdog struct {
 	Disabled        bool     `json:"disabled" yaml:"disabled"`
 	AllowedPackages []string `json:"allowed-packages" yaml:"allowed-packages"`
-}
-
-// ApplicationService describes a single service the application that exposes to the outside world
-type ApplicationService struct {
-	Port      int               `json:"port,omitempty" yaml:"port,omitempty"`
-	Protocols []NetworkProtocol `json:"protocols" yaml:"protocols"`
-	Expose    bool              `json:"expose" yaml:"expose"`
-	Name      string            `json:"name" yaml:"name"`
 }
 
 // Application represents an AMS application
@@ -198,7 +190,7 @@ type ApplicationPatch struct {
 	Resources          *ApplicationResourcesPost `json:"resources,omitempty" yaml:"resources,omitempty"`
 	InhibitAutoUpdates *bool                     `json:"inhibit_auto_updates" yaml:"inhibit_auto_updates"`
 	// For application version update, changing those values would trigger a new application version creation
-	Services            *[]ApplicationService `json:"services,omitempty" yaml:"services,omitempty"`
+	Services            *[]NetworkServiceSpec `json:"services,omitempty" yaml:"services,omitempty"`
 	Watchdog            *ApplicationWatchdog  `json:"watchdog" yaml:"watchdog"`
 	BootActivity        *string               `json:"boot_activity" yaml:"boot-activity"`
 	RequiredPermissions *[]string             `json:"required_permissions" yaml:"required_permissions"`

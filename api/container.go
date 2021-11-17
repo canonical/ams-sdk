@@ -4,12 +4,12 @@
  * Copyright 2021 Canonical Ltd.
  *
  * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License version 3, as published
+ * the terms of the Lesser GNU General Public License version 3, as published
  * by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranties of MERCHANTABILITY, SATISFACTORY
- * QUALITY, or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * QUALITY, or FITNESS FOR A PARTICULAR PURPOSE.  See the Lesser GNU General Public
  * License for more details.
  *
  * You should have received a copy of the Lesser GNU General Public License along
@@ -88,13 +88,38 @@ func NetworkProtocolFromString(value string) NetworkProtocol {
 	return "unknown"
 }
 
+// NetworkServiceSpec is used to define the user defined network services that should be opened on a container
+type NetworkServiceSpec struct {
+	// Port is the port the container provides a service on
+	Port int `json:"port,omitempty" yaml:"port,omitempty"`
+	// PortEnd is the end of the port range set for a service. If empty, only a
+	// single port is opened
+	PortEnd int `json:"port_end,omitempty" yaml:"port_end,omitempty"`
+	// List of network protocols (tcp, udp) the port should be exposed for
+	Protocols []NetworkProtocol `json:"protocols" yaml:"protocols"`
+	// Expose defines wether the service is exposed on the public endpoint of the node
+	// or if it is only available on the private endpoint. To expose the service set to
+	// true and to false otherwise.
+	Expose bool `json:"expose" yaml:"expose"`
+	// Name gives the container a hint what the exposed port is being used for. This
+	// allows further tweaks inside the container to expose the service correctly.
+	Name string `json:"name" yaml:"name"`
+}
+
 // ContainerService describes a single service the container exposes to the outside world.
+// While NetworkServiceSpec defines what the user requests, ContainerService is what is actually
+// opened on the container.
 type ContainerService struct {
 	// Port is the port the container provides a service on
 	Port int `json:"port,omitempty" yaml:"port,omitempty"`
-	// NodePort defines the port the port is mapped on on the node it is running on
+	// PortEnd, if specified, denotes the end of the port range starting at Port
+	PortEnd int `json:"port_end,omitempty" yaml:"port_end,omitempty"`
+	// NodePort is the port used on the LXD node to map to the service port
 	// If left empty the node port is automatically selected.
 	NodePort *int `json:"node_port,omitempty" yaml:"node_port,omitempty"`
+	// NodePortEnd, if specified, denotes the end of the port range on the node starting
+	// at NodePort
+	NodePortEnd *int `json:"node_port_end,omitempty" yaml:"node_port_end,omitempty"`
 	// List of network protocols (tcp, udp) the port should be exposed for
 	Protocols []NetworkProtocol `json:"protocols" yaml:"protocols"`
 	// Expose defines wether the service is exposed on the public endpoint of the node
@@ -155,24 +180,27 @@ type Container struct {
 	} `json:"resources,omitempty"`
 
 	Architecture string `json:"architecture,omitempty" yaml:"architecture,omitempty"`
+
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 // ContainersPost represents the fields required to launch a new container for
 // a specific application
 type ContainersPost struct {
-	ApplicationID      string             `json:"app_id" yaml:"app_id"`
-	ApplicationVersion *int               `json:"app_version" yaml:"app_version"`
-	ImageID            string             `json:"image_id" yaml:"image_id"`
-	ImageVersion       *int               `json:"image_version" yaml:"image_version"`
-	InstanceType       string             `json:"instance_type" yaml:"instance_type"`
-	Node               string             `json:"node" yaml:"node"`
-	Userdata           *string            `json:"user_data,omitempty" yaml:"user_data,omitempty"`
-	Addons             []string           `json:"addons,omitempty" yaml:"addons,omitempty"`
-	Services           []ContainerService `json:"services" yaml:"services"`
-	DiskSize           *int64             `json:"disk_size" yaml:"disk_size"`
-	CPUs               *int               `json:"cpus,omitempty" yaml:"cpus,omitempty"`
-	Memory             *int64             `json:"memory,omitempty" yaml:"memory,omitempty"`
-	GPUSlots           *int               `json:"gpu-slots,omitempty" yaml:"gpu-slots,omitempty"`
+	ApplicationID      string               `json:"app_id" yaml:"app_id"`
+	ApplicationVersion *int                 `json:"app_version" yaml:"app_version"`
+	ImageID            string               `json:"image_id" yaml:"image_id"`
+	ImageVersion       *int                 `json:"image_version" yaml:"image_version"`
+	InstanceType       string               `json:"instance_type" yaml:"instance_type"`
+	Node               string               `json:"node" yaml:"node"`
+	Userdata           *string              `json:"user_data,omitempty" yaml:"user_data,omitempty"`
+	Addons             []string             `json:"addons,omitempty" yaml:"addons,omitempty"`
+	Services           []NetworkServiceSpec `json:"services" yaml:"services"`
+	DiskSize           *int64               `json:"disk_size" yaml:"disk_size"`
+	CPUs               *int                 `json:"cpus,omitempty" yaml:"cpus,omitempty"`
+	Memory             *int64               `json:"memory,omitempty" yaml:"memory,omitempty"`
+	GPUSlots           *int                 `json:"gpu-slots,omitempty" yaml:"gpu-slots,omitempty"`
+	Tags               []string             `json:"tags,omitempty" yaml:"tags,omitempty"`
 	Config             struct {
 		Platform        string `json:"platform,omitempty" yaml:"platform,omitempty"`
 		BootPackage     string `json:"boot_package,omitempty" yaml:"boot_package,omitempty"`
