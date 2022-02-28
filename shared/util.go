@@ -41,6 +41,11 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+const (
+	// ValidActivityNamePattern represents the pattern of valid Android activity name
+	ValidActivityNamePattern = `(^([A-Za-z]{1}[A-Za-z\d_]*\.){2,}|^(\.){1})[A-Za-z][A-Za-z\d_]*$`
+)
+
 // VarPath returns the provided path elements joined by a slash and
 // appended to the end of $SNAP_COMMON, which defaults to /var/lib/ams.
 func VarPath(path ...string) string {

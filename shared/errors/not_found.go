@@ -36,3 +36,13 @@ func (e ErrNotFound) Error() string {
 func NewErrNotFound(what string) ErrNotFound {
 	return ErrNotFound{content{what}}
 }
+
+// IsErrNotFound checks if the given error is of type ErrNotFound
+func IsErrNotFound(err error) bool {
+	switch err.(type) {
+	case ErrNotFound:
+		return true
+	default:
+		return false
+	}
+}

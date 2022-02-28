@@ -196,6 +196,7 @@ type ApplicationPatch struct {
 	RequiredPermissions *[]string             `json:"required_permissions" yaml:"required_permissions"`
 	VideoEncoder        *VideoEncoderType     `json:"video_encoder,omitempty" yaml:"video-encoder,omitempty"`
 	ManifestVersion     *string               `json:"manifest_version" yaml:"manifest-version"`
+	Features            *[]string             `json:"features" yaml:"features"`
 }
 
 // ApplicationDelete represents the fields used to delete an application
