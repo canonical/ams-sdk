@@ -99,7 +99,7 @@ func main() {
 }
 
 func launchContainer(c client.Client, details *api.ContainersPost) error {
-	operation, err := c.LaunchContainer(details)
+	operation, err := c.LaunchContainer(details, false)
 	if err != nil {
 		return err
 	}

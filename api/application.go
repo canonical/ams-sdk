@@ -105,6 +105,8 @@ type ApplicationVersion struct {
 	Watchdog            ApplicationWatchdog             `json:"watchdog" yaml:"watchdog"`
 	Services            []NetworkServiceSpec            `json:"services,omitempty" yaml:"services,omitempty"`
 	Features            []string                        `json:"features" yaml:"features"`
+	Hooks               ApplicationHooks                `json:"hooks,omitempty" yaml:"hooks,omitempty"`
+	Bootstrap           ApplicationBootstrap            `json:"bootstrap,omitempty" yaml:"bootstrap,omitempty"`
 }
 
 // ApplicationExtraData represents an extra application data
@@ -156,6 +158,16 @@ type ApplicationWatchdog struct {
 	AllowedPackages []string `json:"allowed-packages" yaml:"allowed-packages"`
 }
 
+// ApplicationHooks describes the fields used to configure the hooks of an application
+type ApplicationHooks struct {
+	Timeout string `json:"timeout,omitempty" yaml:"timeout,omitempty"`
+}
+
+// ApplicationBootstrap describes the fields used to configure the application bootstrap
+type ApplicationBootstrap struct {
+	Keep []string `json:"keep,omitempty" yaml:"keep,omitempty"`
+}
+
 // Application represents an AMS application
 type Application struct {
 	ID                 string               `json:"id" yaml:"id"`
@@ -197,6 +209,8 @@ type ApplicationPatch struct {
 	VideoEncoder        *VideoEncoderType     `json:"video_encoder,omitempty" yaml:"video-encoder,omitempty"`
 	ManifestVersion     *string               `json:"manifest_version" yaml:"manifest-version"`
 	Features            *[]string             `json:"features" yaml:"features"`
+	Hooks               *ApplicationHooks     `json:"hooks,omitempty" yaml:"hooks,omitempty"`
+	Bootstrap           *ApplicationBootstrap `json:"bootstrap,omitempty" yaml:"bootstrap,omitempty"`
 }
 
 // ApplicationDelete represents the fields used to delete an application

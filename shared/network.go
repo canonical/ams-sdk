@@ -59,7 +59,6 @@ func RFC3493Dialer(network, address string) (net.Conn, error) {
 func InitTLSConfig() *tls.Config {
 	return &tls.Config{
 		MinVersion: tls.VersionTLS12,
-		MaxVersion: tls.VersionTLS12,
 		CipherSuites: []uint16{
 			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
@@ -70,7 +69,14 @@ func InitTLSConfig() *tls.Config {
 			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 			tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 		},
-		PreferServerCipherSuites: true,
+	}
+}
+
+// InitTLS13Config returns a tls.Config populated with TLS1.3
+// as the minimum TLS version for TLS configuration
+func InitTLS13Config() *tls.Config {
+	return &tls.Config{
+		MinVersion: tls.VersionTLS13,
 	}
 }
 
@@ -99,10 +105,19 @@ func finalizeTLSConfig(tlsConfig *tls.Config, tlsRemoteCert *x509.Certificate) {
 	tlsConfig.BuildNameToCertificate()
 }
 
-// GetTLSConfig returns a tls config
+// GetTLSConfig returns a tls 1.2 config
 func GetTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, tlsRemoteCert *x509.Certificate) (*tls.Config, error) {
 	tlsConfig := InitTLSConfig()
+	return getTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile, tlsRemoteCert, tlsConfig)
+}
 
+// GetTLS13Config returns a tls 1.3 config
+func GetTLS13Config(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, tlsRemoteCert *x509.Certificate) (*tls.Config, error) {
+	tlsConfig := InitTLS13Config()
+	return getTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile, tlsRemoteCert, tlsConfig)
+}
+
+func getTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, tlsRemoteCert *x509.Certificate, tlsConfig *tls.Config) (*tls.Config, error) {
 	// Client authentication
 	if tlsClientCertFile != "" && tlsClientKeyFile != "" {
 		cert, err := tls.LoadX509KeyPair(tlsClientCertFile, tlsClientKeyFile)
@@ -130,8 +145,11 @@ func GetTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, t
 }
 
 // GetTLSConfigMem returns a tls config
-func GetTLSConfigMem(tlsClientCert string, tlsClientKey string, tlsClientCA string, tlsRemoteCertPEM string, insecureSkipVerify bool) (*tls.Config, error) {
-	tlsConfig := InitTLSConfig()
+func GetTLSConfigMem(tlsClientCert string, tlsClientKey string, tlsClientCA string, tlsRemoteCertPEM string, insecureSkipVerify, useTLS12 bool) (*tls.Config, error) {
+	tlsConfig := InitTLS13Config()
+	if useTLS12 {
+		tlsConfig = InitTLSConfig()
+	}
 	tlsConfig.InsecureSkipVerify = insecureSkipVerify
 	// Client authentication
 	if tlsClientCert != "" && tlsClientKey != "" {

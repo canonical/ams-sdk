@@ -52,7 +52,7 @@ type Client interface {
 
 	// Containers
 	ListContainers() ([]api.Container, error)
-	LaunchContainer(details *api.ContainersPost) (restclient.Operation, error)
+	LaunchContainer(details *api.ContainersPost, noWait bool) (restclient.Operation, error)
 	RetrieveContainerByID(id string) (*api.Container, string, error)
 	DeleteContainerByID(id string, force bool) (restclient.Operation, error)
 	RetrieveContainerLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error

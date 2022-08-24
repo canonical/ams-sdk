@@ -20,6 +20,7 @@ package shared
 
 import (
 	"crypto/sha256"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -60,6 +61,11 @@ func GetRemoteCertificate(address string) (*x509.Certificate, error) {
 		return nil, err
 	}
 
+	return GetRemoteCertificateWithTLSConfig(address, tlsConfig)
+}
+
+// GetRemoteCertificateWithTLSConfig connects to the server and returns its certificate
+func GetRemoteCertificateWithTLSConfig(address string, tlsConfig *tls.Config) (*x509.Certificate, error) {
 	tlsConfig.InsecureSkipVerify = true
 	tr := &http.Transport{
 		TLSClientConfig:   tlsConfig,

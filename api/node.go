@@ -66,9 +66,9 @@ func (s *NodeStatus) String() string {
 
 // NodeGPUAllocation describes a single allocation on a GPU
 type NodeGPUAllocation struct {
-	GPUs         []uint64 `json:"gpus"`
-	Slots        int      `json:"slots"`
-	EncoderSlots int      `json:"encoder_slots"`
+	GPUs         []uint64 `json:"gpus" yaml:"gpus"`
+	Slots        int      `json:"slots" yaml:"slots"`
+	EncoderSlots int      `json:"encoder_slots" yaml:"encoder_slots"`
 }
 
 // NodeGPU describes a single GPU available on a node
@@ -124,6 +124,7 @@ type NodesPost struct {
 	StoragePool          string   `json:"storage_pool" yaml:"storage_pool"`
 	NetworkName          string   `json:"network_name" yaml:"network_name"`
 	NetworkSubnet        string   `json:"network_subnet" yaml:"network_subnet"`
+	NetworkACLName       string   `json:"network_acl_name" yaml:"network_acl_name"`
 }
 
 // NodeGPUPatch allows changing configuration for individual GPUs
@@ -147,6 +148,7 @@ type NodePatch struct {
 	Tags                 *[]string      `json:"tags" yaml:"tags"`
 	Unschedulable        *bool          `json:"unscheduable" yaml:"unscheduable"`
 	GPUs                 []NodeGPUPatch `json:"gpus" yaml:"gpus"`
+	Subnet               *string        `json:"subnet" yaml:"subnet"`
 }
 
 // NodeDelete describes a request used to delete a node

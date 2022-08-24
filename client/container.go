@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 	"github.com/anbox-cloud/ams-sdk/api"
@@ -52,14 +53,15 @@ func (c *clientImpl) ListContainers() ([]api.Container, error) {
 }
 
 // LaunchContainer launches a single new container on the AMS endpoint
-func (c *clientImpl) LaunchContainer(details *api.ContainersPost) (client.Operation, error) {
+func (c *clientImpl) LaunchContainer(details *api.ContainersPost, noWait bool) (client.Operation, error) {
 	b, err := json.Marshal(details)
 
 	if err != nil {
 		return nil, err
 	}
 
-	op, _, err := c.QueryOperation("POST", client.APIPath("containers"), nil, nil, bytes.NewReader(b), "")
+	params := client.QueryParams{"no_wait": strconv.FormatBool(noWait)}
+	op, _, err := c.QueryOperation("POST", client.APIPath("containers"), params, nil, bytes.NewReader(b), "")
 	return op, err
 }
 

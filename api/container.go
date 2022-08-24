@@ -170,6 +170,7 @@ type Container struct {
 		BootActivity    string `json:"boot_activity,omitempty" yaml:"boot_activity,omitempty"`
 		MetricsServer   string `json:"metrics_server,omitempty" yaml:"metrics_server,omitempty"`
 		DisableWatchdog bool   `json:"disable_watchdog,omitempty" yaml:"disable_watchdog,omitempty"`
+		DevMode         bool   `json:"devmode,omitempty" yaml:"devmode,omitempty"`
 	} `json:"config,omitempty"`
 
 	Resources struct {
@@ -208,6 +209,7 @@ type ContainersPost struct {
 		MetricsServer   string `json:"metrics_server,omitempty" yaml:"metrics_server,omitempty"`
 		DisableWatchdog bool   `json:"disable_watchdog,omitempty" yaml:"disable_watchdog,omitempty"`
 		Features        string `json:"features,omitempty" yaml:"features,omitempty"`
+		DevMode         bool   `json:"devmode,omitempty" yaml:"devmode,omitempty"`
 	} `json:"config,omitempty"`
 }
 

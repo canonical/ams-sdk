@@ -18,11 +18,23 @@
 
 package api
 
+// RegistryApplicationHooks describes the fields used to configure the hooks of an application
+type RegistryApplicationHooks struct {
+	Timeout string `json:"timeout" yaml:"timeout"`
+}
+
+// RegistryApplicationBootstrap describes the fields used to configure the application bootstrap
+type RegistryApplicationBootstrap struct {
+	Keep []string `json:"keep" yaml:"keep"`
+}
+
 // RegistryApplicationVersion describes a version of an application available
 // in the registry
 type RegistryApplicationVersion struct {
-	BootActivity string   `json:"boot_activity" yaml:"boot_activity"`
-	Features     []string `json:"features"`
+	BootActivity string                       `json:"boot_activity" yaml:"boot_activity"`
+	Features     []string                     `json:"features" yaml:"features"`
+	Hooks        RegistryApplicationHooks     `json:"hooks" yaml:"hooks"`
+	Bootstrap    RegistryApplicationBootstrap `json:"bootstrap" yaml:"bootstrap"`
 }
 
 // RegistryApplication describes a single application available in the registry
