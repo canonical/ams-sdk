@@ -34,7 +34,6 @@ type Operation interface {
 	AddHandler(function func(api.Operation)) (target *EventTarget, err error)
 	Cancel() (err error)
 	Get() (op api.Operation)
-	GetWebsocket() (conn *websocket.Conn, err error)
 	RemoveHandler(target *EventTarget) (err error)
 	Refresh() (err error)
 	Wait(ctx context.Context) (err error)
@@ -46,7 +45,7 @@ type Operations interface {
 	ListOperations() (operations []api.Operation, err error)
 	RetrieveOperationByID(uuid string) (op *api.Operation, etag string, err error)
 	WaitForOperationToFinish(uuid string, timeout time.Duration) (op *api.Operation, err error)
-	GetOperationWebsocket(uuid string) (conn *websocket.Conn, err error)
+	GetOperationWebsocket(uuid, secret string) (conn *websocket.Conn, err error)
 	DeleteOperation(uuid string) (err error)
 }
 

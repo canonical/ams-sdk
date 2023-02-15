@@ -152,6 +152,7 @@ type Container struct {
 	Status        string             `json:"status" yaml:"status"`
 	Node          string             `json:"node" yaml:"node"`
 	AppID         string             `json:"app_id" yaml:"app_id"`
+	AppName       string             `json:"app_name" yaml:"app_name"`
 	AppVersion    int                `json:"app_version" yaml:"app_version"`
 	ImageID       string             `json:"image_id" yaml:"image_id"`
 	ImageVersion  int                `json:"image_version" yaml:"image_version"`
@@ -211,18 +212,12 @@ type ContainersPost struct {
 		Features        string `json:"features,omitempty" yaml:"features,omitempty"`
 		DevMode         bool   `json:"devmode,omitempty" yaml:"devmode,omitempty"`
 	} `json:"config,omitempty"`
+	NoStart bool `json:"no_start,omitempty" yaml:"no_start,omitempty"`
 }
 
 // ContainersGet represents a list of containers
 type ContainersGet struct {
 	Containers []Container `json:"containers" yaml:"containers"`
-}
-
-// ContainerPatch describes the fields which can be changed for an existing container
-type ContainerPatch struct {
-	Status     *string `json:"status"`
-	ErrCode    *int    `json:"error_code,omitempty"`
-	ErrMessage *string `json:"error_message,omitempty"`
 }
 
 // ContainerExecPost represents a AMS container shell request
@@ -248,4 +243,9 @@ type ContainerExecControl struct {
 // ContainerDelete describes a request used to delete a container
 type ContainerDelete struct {
 	Force bool `json:"force"`
+}
+
+// ContainerPatch describes the fields which can be changed for an existing container
+type ContainerPatch struct {
+	DesiredStatus *string `json:"desired_status"`
 }

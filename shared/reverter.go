@@ -38,14 +38,15 @@ type RevertFunc func(ctx context.Context) error
 // defer r.Finish()
 //
 // doOperation()
-// r.Add(func(ctx context.Context) error {
-//   revertOperation()
-//   return nil
-// })
 //
-// if err := doOtherOperation(); err != nil {
-//   return err
-// }
+//	r.Add(func(ctx context.Context) error {
+//	  revertOperation()
+//	  return nil
+//	})
+//
+//	if err := doOtherOperation(); err != nil {
+//	  return err
+//	}
 //
 // r.Defuse()
 type Reverter struct {

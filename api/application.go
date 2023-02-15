@@ -186,6 +186,7 @@ type Application struct {
 	Resources          ApplicationResources `json:"resources,omitempty" yaml:"resources,omitempty"`
 	ABI                string               `json:"abi,omitempty" yaml:"abi,omitempty"`
 	InhibitAutoUpdates bool                 `json:"inhibit_auto_updates" yaml:"inhibit_auto_updates"`
+	NodeSelector       []string             `json:"node_selector" yaml:"node_selector"`
 }
 
 // ApplicationVersionPatch represents the fields used to update an application version
@@ -211,6 +212,7 @@ type ApplicationPatch struct {
 	Features            *[]string             `json:"features" yaml:"features"`
 	Hooks               *ApplicationHooks     `json:"hooks,omitempty" yaml:"hooks,omitempty"`
 	Bootstrap           *ApplicationBootstrap `json:"bootstrap,omitempty" yaml:"bootstrap,omitempty"`
+	NodeSelector        *[]string             `json:"node_selector,omitempty" yaml:"node-selector,omitempty"`
 }
 
 // ApplicationDelete represents the fields used to delete an application

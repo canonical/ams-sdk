@@ -19,6 +19,7 @@
 package client
 
 import (
+	"fmt"
 	"net/url"
 	"time"
 
@@ -87,8 +88,11 @@ func (c *operations) WaitForOperationToFinish(uuid string, timeout time.Duration
 }
 
 // GetOperationWebsocket returns a websocket connection for the provided operation
-func (c *operations) GetOperationWebsocket(uuid string) (*websocket.Conn, error) {
+func (c *operations) GetOperationWebsocket(uuid, secret string) (*websocket.Conn, error) {
 	resource := APIPath("operations", url.QueryEscape(uuid), "websocket")
+	if secret != "" {
+		resource = fmt.Sprintf("%s?secret=%s", resource, url.QueryEscape(secret))
+	}
 	return c.Websocket(resource)
 }
 

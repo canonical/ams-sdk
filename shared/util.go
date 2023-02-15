@@ -49,9 +49,13 @@ const (
 // VarPath returns the provided path elements joined by a slash and
 // appended to the end of $SNAP_COMMON, which defaults to /var/lib/ams.
 func VarPath(path ...string) string {
-	varDir := os.Getenv("SNAP_COMMON")
-	if varDir == "" {
-		varDir = "/var/lib/ams"
+	varDir := "/var/lib/ams"
+	for _, envName := range []string{"SNAP_COMMON", "AMS_DIR"} {
+		v := os.Getenv(envName)
+		if len(v) > 0 {
+			varDir = v
+			break
+		}
 	}
 
 	items := []string{varDir}

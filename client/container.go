@@ -55,7 +55,6 @@ func (c *clientImpl) ListContainers() ([]api.Container, error) {
 // LaunchContainer launches a single new container on the AMS endpoint
 func (c *clientImpl) LaunchContainer(details *api.ContainersPost, noWait bool) (client.Operation, error) {
 	b, err := json.Marshal(details)
-
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +72,22 @@ func (c *clientImpl) RetrieveContainerByID(id string) (*api.Container, string, e
 	container := &api.Container{}
 	etag, err := c.QueryStruct("GET", client.APIPath("containers", id), nil, nil, nil, "", container)
 	return container, etag, err
+}
+
+// UpdateContainerByID updates an existing container specified by its id
+func (c *clientImpl) UpdateContainerByID(id string, details *api.ContainerPatch, noWait bool) (client.Operation, error) {
+	if len(id) == 0 {
+		return nil, errs.NewInvalidArgument("id")
+	}
+
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+
+	params := client.QueryParams{"no_wait": strconv.FormatBool(noWait)}
+	op, _, err := c.QueryOperation("PATCH", client.APIPath("containers", id), params, nil, bytes.NewReader(b), "")
+	return op, err
 }
 
 // DeleteContainerByID deletes a single container specified by its id

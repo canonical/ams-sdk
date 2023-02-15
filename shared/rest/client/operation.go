@@ -25,8 +25,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gorilla/websocket"
-
 	"github.com/anbox-cloud/ams-sdk/shared/rest/api"
 )
 
@@ -81,11 +79,6 @@ func (op *operation) Cancel() error {
 // Get returns the API operation struct
 func (op *operation) Get() api.Operation {
 	return op.Operation
-}
-
-// GetWebsocket returns a raw websocket connection from the operation
-func (op *operation) GetWebsocket() (*websocket.Conn, error) {
-	return op.c.GetOperationWebsocket(op.ID)
 }
 
 // RemoveHandler removes a function to be called whenever an event is received

@@ -79,6 +79,7 @@ type NodeGPU struct {
 	Slots        int                          `json:"slots" yaml:"slots"`
 	EncoderSlots int                          `json:"encoder_slots" yaml:"encoder_slots"`
 	Allocations  map[string]NodeGPUAllocation `json:"allocations" yaml:"allocations"`
+	NUMANode     uint64                       `json:"numa_node" yaml:"numa_node"`
 }
 
 // Node describes a single node of the underlying LXD cluster AMS manages

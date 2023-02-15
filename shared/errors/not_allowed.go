@@ -36,3 +36,13 @@ func (e ErrNotAllowed) Error() string {
 func NewErrNotAllowed(what string) ErrNotAllowed {
 	return ErrNotAllowed{content{what}}
 }
+
+// IsErrNotAllowed checks if the given error is of type ErrNotAllowed
+func IsErrNotAllowed(err error) bool {
+	switch err.(type) {
+	case ErrNotAllowed:
+		return true
+	default:
+		return false
+	}
+}
