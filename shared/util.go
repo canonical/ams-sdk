@@ -19,6 +19,7 @@
 package shared
 
 import (
+	"archive/zip"
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
@@ -325,6 +326,69 @@ func ValueOrDefault(value string, defaultValue string) string {
 	return defaultValue
 }
 
+// CreateZip creates a zip file with given files path
+func CreateZip(workingDir, outputPath string, content []string) error {
+	oldDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	err = os.Chdir(workingDir)
+	if err != nil {
+		return err
+	}
+	defer os.Chdir(oldDir)
+
+	zipPath, err := os.Create(outputPath)
+	if err != nil {
+		return err
+	}
+	defer zipPath.Close()
+
+	writer := zip.NewWriter(zipPath)
+	defer writer.Close()
+	for _, file := range content {
+		walker := func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			hdr, err := zip.FileInfoHeader(info)
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
+				path = fmt.Sprintf("%s%c", path, os.PathSeparator)
+			}
+
+			fi, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer fi.Close()
+
+			hdr.Name = path
+
+			dst, err := writer.CreateHeader(hdr)
+			if err != nil {
+				return err
+			}
+
+			if !info.IsDir() {
+				_, err = io.Copy(dst, fi)
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		}
+		err = filepath.Walk(file, walker)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // CreateBzip2Tarball creates a bzip2 tarball file with given files path
 func CreateBzip2Tarball(workingDir, outputPath string, content []string) error {
 	comopressArg := []string{
@@ -332,6 +396,7 @@ func CreateBzip2Tarball(workingDir, outputPath string, content []string) error {
 		"-C", workingDir,
 	}
 	comopressArg = append(comopressArg, content...)
+
 	return exec.Command("tar", comopressArg...).Run()
 }
 

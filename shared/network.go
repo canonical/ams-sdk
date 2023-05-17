@@ -238,7 +238,7 @@ func WebsocketRecvStream(w io.Writer, conn *websocket.Conn) chan bool {
 			}
 
 			if mt == websocket.TextMessage {
-				log.Printf("got message barrier")
+				log.Printf("got message barrier (type %d)", mt)
 				break
 			}
 
@@ -503,17 +503,38 @@ var WebsocketUpgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-// AllocatePort asks the kernel for a free open port that is ready to use
-func AllocatePort() (int, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+func isLoopback(iface *net.Interface) bool {
+	return int(iface.Flags&net.FlagLoopback) > 0
+}
+
+// ListAvailableAddresses returns a list of network addresses the host has. It
+// ignores the loopback device
+func ListAvailableAddresses() ([]string, error) {
+	ret := []string{}
+
+	ifs, err := net.Interfaces()
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return -1, err
+	for _, iface := range ifs {
+		if isLoopback(&iface) {
+			continue
+		}
+
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return nil, err
+		}
+
+		for _, addr := range addrs {
+			if ip, _, err := net.ParseCIDR(addr.String()); err == nil {
+				if !ip.IsLinkLocalUnicast() && !ip.IsLinkLocalMulticast() {
+					ret = append(ret, ip.String())
+				}
+			}
+		}
 	}
-	defer l.Close()
-	return l.Addr().(*net.TCPAddr).Port, nil
+
+	return ret, nil
 }

@@ -61,7 +61,6 @@ func (c *clientImpl) UpdateApplicationWithPackage(id, packagePath string, sentBy
 	if len(id) == 0 {
 		return nil, errs.NewInvalidArgument("id")
 	}
-
 	return c.upload("PATCH", client.APIPath("applications", id), packagePath, nil, sentBytes)
 }
 

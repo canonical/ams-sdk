@@ -16,37 +16,28 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package shared
+package packages
 
 import (
-	"net"
+	"os"
+	"strings"
 )
 
-// GetFreePort asks the kernel for a free open port that is ready to use.
-func GetFreePort() (int, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-	if err != nil {
-		return -1, err
-	}
+// ContentList represents a list of content
+type ContentList []string
 
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return -1, err
+// Has checks if the given content is included in the content list
+func (c *ContentList) Has(content string) bool {
+	for _, contentPath := range *c {
+		// Dir path contains a trailing separator, which needs to be removed before comparing
+		if strings.TrimRight(contentPath, string(os.PathSeparator)) == content {
+			return true
+		}
 	}
-	defer l.Close()
-	return l.Addr().(*net.TCPAddr).Port, nil
+	return false
 }
 
-// GetFreePorts asks the kernel for a number of free open ports that are
-// ready to use.
-func GetFreePorts(count int) ([]int, error) {
-	var ports []int
-	for i := 0; i < count; i++ {
-		p, err := GetFreePort()
-		if err != nil {
-			return nil, err
-		}
-		ports = append(ports, p)
-	}
-	return ports, nil
+// Add adds new contents into the list
+func (c *ContentList) Add(content ...string) {
+	*c = append(*c, content...)
 }

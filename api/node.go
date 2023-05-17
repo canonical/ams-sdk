@@ -99,11 +99,13 @@ type Node struct {
 	GPUSlots             int        `json:"gpu_slots" yaml:"gpu_slots"`
 	GPUEncoderSlots      int        `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
 	Tags                 []string   `json:"tags" yaml:"tags"`
-	Unschedulable        bool       `json:"unscheduable" yaml:"unscheduable"`
+	Unschedulable        bool       `json:"unschedulable" yaml:"unschedulable"`
 	Architecture         string     `json:"architecture,omitempty" yaml:"architecture,omitempty"`
 	StoragePool          string     `json:"storage_pool" yaml:"storage_pool"`
 	Managed              bool       `json:"managed" yaml:"managed"`
 	GPUs                 []NodeGPU  `json:"gpus" yaml:"gpus"`
+
+	DEPRECATEDUnschedulable bool `json:"unscheduable" yaml:"unscheduable"`
 }
 
 // NodesPost describes a request to create a new node on AMS

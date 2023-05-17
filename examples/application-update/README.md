@@ -14,7 +14,7 @@ You have to provide the following parameters in any order:
 | `key`     | Path to the file with the client key to use to connect to AMS  | required |
 | `url`     | URL of the AMS server      | required |
 | `id`      | Identifier of the application to update   | required |
-| `package-path` | Path to the application tarball      | required |
+| `package-path` | Path to the application zip or tarball      | required |
 
 The package must be a valid tar.bz2 file with this struture:
 

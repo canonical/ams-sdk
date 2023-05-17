@@ -27,16 +27,29 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
+	"github.com/anbox-cloud/ams-sdk/packages"
 	"github.com/anbox-cloud/ams-sdk/shared"
+	errs "github.com/anbox-cloud/ams-sdk/shared/errors"
 	"github.com/anbox-cloud/ams-sdk/shared/rest/client"
 )
 
 func (c *clientImpl) upload(httpOp, apiPath, packagePath string, details interface{}, sentBytes chan float64) (client.Operation, error) {
+	if !c.HasExtension("zip_archive_support") {
+		if packages.IsZip(packagePath) {
+			return nil, errs.NewErrNotSupported("api extension \"zip_archive_support\"")
+		}
+		pkgType, err := packages.DetectPackageType(packagePath)
+		if err != nil {
+			return nil, err
+		}
+		if pkgType == packages.PackageTypeZip {
+			return nil, errs.NewErrNotSupported("api extension \"zip_archive_support\"")
+		}
+	}
 	f, fingerprint, err := preparePayload(packagePath)
 	if err != nil {
 		return nil, err
 	}
-
 	request := []byte{}
 	if details != nil {
 		request, err = json.Marshal(details)
