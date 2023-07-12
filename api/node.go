@@ -149,9 +149,11 @@ type NodePatch struct {
 	GPUSlots             *int           `json:"gpu_slots"`
 	GPUEncoderSlots      *int           `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
 	Tags                 *[]string      `json:"tags" yaml:"tags"`
-	Unschedulable        *bool          `json:"unscheduable" yaml:"unscheduable"`
+	Unschedulable        *bool          `json:"unschedulable" yaml:"unschedulable"`
 	GPUs                 []NodeGPUPatch `json:"gpus" yaml:"gpus"`
 	Subnet               *string        `json:"subnet" yaml:"subnet"`
+
+	DEPRECATEDUnschedulable *bool `json:"unscheduable" yaml:"unscheduable"`
 }
 
 // NodeDelete describes a request used to delete a node

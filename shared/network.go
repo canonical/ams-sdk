@@ -503,35 +503,20 @@ var WebsocketUpgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func isLoopback(iface *net.Interface) bool {
-	return int(iface.Flags&net.FlagLoopback) > 0
-}
-
-// ListAvailableAddresses returns a list of network addresses the host has. It
-// ignores the loopback device
+// ListAvailableAddresses returns a list of IPv4 network addresses the host has.
+// It ignores the loopback device
 func ListAvailableAddresses() ([]string, error) {
 	ret := []string{}
 
-	ifs, err := net.Interfaces()
+	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		return nil, err
 	}
 
-	for _, iface := range ifs {
-		if isLoopback(&iface) {
-			continue
-		}
-
-		addrs, err := iface.Addrs()
-		if err != nil {
-			return nil, err
-		}
-
-		for _, addr := range addrs {
-			if ip, _, err := net.ParseCIDR(addr.String()); err == nil {
-				if !ip.IsLinkLocalUnicast() && !ip.IsLinkLocalMulticast() {
-					ret = append(ret, ip.String())
-				}
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !(ipnet.IP.IsLoopback() || ipnet.IP.IsLinkLocalUnicast()) {
+			if ipnet.IP.To4() != nil {
+				ret = append(ret, ipnet.IP.String())
 			}
 		}
 	}
