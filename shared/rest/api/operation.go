@@ -71,18 +71,49 @@ operation:
       description: The error string if the operation failed
 `
 
-// Operation represents a LXD background operation
+// Operation represents a background operation
+//
+// swagger:model
 type Operation struct {
-	ID            string                 `json:"id" yaml:"id"`
-	Class         string                 `json:"class" yaml:"class"`
-	Description   string                 `json:"description" yaml:"description"`
-	CreatedAt     time.Time              `json:"created_at" yaml:"created_at"`
-	UpdatedAt     time.Time              `json:"updated_at" yaml:"updated_at"`
-	Status        string                 `json:"status" yaml:"status"`
-	StatusCode    StatusCode             `json:"status_code" yaml:"status_code"`
-	Resources     map[string][]string    `json:"resources,omitempty" yaml:"resources,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty" yaml:"metadata,omitempty"`
-	MayCancel     bool                   `json:"may_cancel" yaml:"may_cancel"`
-	Err           string                 `json:"err,omitempty" yaml:"err,omitempty"`
-	ServerAddress string                 `json:"server_address,omitempty" yaml:"server_address,omitempty"`
+	// UUID of the operation
+	// Example: c6832c58-0867-467e-b245-2962d6527876
+	ID string `json:"id" yaml:"id"`
+	// Class of the operation
+	// Enum: task,websocket,token
+	// Example: task
+	Class string `json:"class" yaml:"class"`
+	// Human readable description of the operation
+	// Example: updating addon 3apqo5te
+	Description string `json:"description" yaml:"description"`
+	// When the operation was created
+	// swagger:strfmt date-time
+	// Example: 2018-04-02T16:49:36.341463206+02:00
+	CreatedAt time.Time `json:"created_at" yaml:"created_at"`
+	// When the operation was updated
+	// swagger:strfmt date-time
+	// Example: 2018-04-02T16:49:36.341463206+02:00
+	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at"`
+	// String version of the operation status
+	// Example: Running
+	Status string `json:"status" yaml:"status"`
+	// Code of the operation status
+	// Example: 103
+	StatusCode StatusCode `json:"status_code" yaml:"status_code"`
+	// Dictionnary of resource types (containers, snapshots, images)
+	// and affected resources
+	// Example: {"applications": [ "/1.0/applications/my-app" ]}
+	Resources map[string][]string `json:"resources,omitempty" yaml:"resources,omitempty"`
+	// Metadata related to the operation and affected resources
+	// Example: {}
+	Metadata map[string]interface{} `json:"metadata,omitempty" yaml:"metadata,omitempty"`
+	// Whether this operation can be canceled (DELETE over REST)
+	// Example: false
+	MayCancel bool `json:"may_cancel" yaml:"may_cancel"`
+	// The error string if the operation failed
+	// Example:
+	Err string `json:"err,omitempty" yaml:"err,omitempty"`
+	// The address of the server where the operation ran
+	// swagger:strfmt ipv4
+	// Example: 10.0.0.1
+	ServerAddress string `json:"server_address,omitempty" yaml:"server_address,omitempty"`
 }

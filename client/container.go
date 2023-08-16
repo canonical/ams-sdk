@@ -108,6 +108,25 @@ func (c *clientImpl) DeleteContainerByID(id string, force bool) (client.Operatio
 	return op, err
 }
 
+// DeleteContainers deletes multiple containers in a bulk operation
+func (c *clientImpl) DeleteContainers(ids []string, force bool) (client.Operation, error) {
+	if len(ids) == 0 {
+		return nil, errs.NewInvalidArgument("ids")
+	}
+
+	details := api.ContainersDelete{
+		IDs:   ids,
+		Force: force,
+	}
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+
+	op, _, err := c.QueryOperation("DELETE", client.APIPath("containers"), nil, nil, bytes.NewReader(b), "")
+	return op, err
+}
+
 // RetrieveContainerLog retrieves a specific log file of a container
 func (c *clientImpl) RetrieveContainerLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error {
 	if len(id) == 0 {

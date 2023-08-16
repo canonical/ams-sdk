@@ -19,6 +19,8 @@
 package api
 
 // VersionGet is the JSON response from the API version request method
+//
+// swagger:model
 type VersionGet struct {
 	Version string `json:"version"`
 }

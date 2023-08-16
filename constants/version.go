@@ -16,19 +16,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package api
+package constants
 
-// ConfigPost contains the field necessary to set or update a config item
-//
-// swagger:model
-type ConfigPost struct {
-	// Example: application.auto_publish
-	Name string `json:"name"`
-	// Example: false
-	Value string `json:"value"`
-}
-
-// ConfigGet describes a list of config items
-type ConfigGet struct {
-	Config map[string]interface{} `json:"config"`
-}
+// Version is the version of AMS set from the build system
+var Version = "unknown"

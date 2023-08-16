@@ -16,19 +16,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package api
+package units
 
-// ConfigPost contains the field necessary to set or update a config item
-//
-// swagger:model
-type ConfigPost struct {
-	// Example: application.auto_publish
-	Name string `json:"name"`
-	// Example: false
-	Value string `json:"value"`
-}
-
-// ConfigGet describes a list of config items
-type ConfigGet struct {
-	Config map[string]interface{} `json:"config"`
-}
+const (
+	// KB defines a single kilo-byte in bytes
+	KB = 1024
+	// MB defines a single mega-byte in bytes
+	MB = KB * 1024
+	// GB defines a single giga-byte in bytes
+	GB = MB * 1024
+)

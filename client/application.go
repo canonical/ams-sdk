@@ -125,6 +125,20 @@ func (c *clientImpl) DeleteApplicationByID(id string, force bool) (client.Operat
 	return op, err
 }
 
+// DeleteApplications deletes multiple applications identified by their ID
+func (c *clientImpl) DeleteApplications(ids []string, force bool) (client.Operation, error) {
+	if len(ids) == 0 {
+		return nil, errs.NewInvalidArgument("ids")
+	}
+	details := api.ApplicationsDelete{IDs: ids, Force: force}
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+	op, _, err := c.QueryOperation("DELETE", client.APIPath("applications"), nil, nil, bytes.NewReader(b), "")
+	return op, err
+}
+
 // ExportApplicationByVersion exports an existing application identified by its version
 func (c *clientImpl) ExportApplicationByVersion(id string, version int, downloader func(header *http.Header, body io.ReadCloser) error) error {
 	if len(id) == 0 {

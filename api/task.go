@@ -77,9 +77,20 @@ func (s TaskStatus) String() string {
 }
 
 // Task is the scheduling unit AMS uses for container launches
+//
+// swagger:model
 type Task struct {
-	ID         string `json:"id"`
-	Status     string `json:"status"`
-	ObjectID   string `json:"object_id"`
+	// ID of the task
+	// Example: c055dl0j1qm027422feg
+	ID string `json:"id"`
+	// Status of the task
+	// Enum: created,prepared,started,running,stopped,shutdown,completed,error,deleted,unknown
+	// Example: running
+	Status string `json:"status"`
+	// ID of the object that the task is operating on
+	// Example: c055dl0j1qm027422fe0
+	ObjectID string `json:"object_id"`
+	// Type of the object that the task is operating on
+	// Example: container
 	ObjectType string `json:"object_type"`
 }

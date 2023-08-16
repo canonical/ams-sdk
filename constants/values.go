@@ -16,19 +16,16 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package api
+package constants
 
-// ConfigPost contains the field necessary to set or update a config item
-//
-// swagger:model
-type ConfigPost struct {
-	// Example: application.auto_publish
-	Name string `json:"name"`
-	// Example: false
-	Value string `json:"value"`
-}
+import (
+	"github.com/anbox-cloud/ams-sdk/pkg/units"
+)
 
-// ConfigGet describes a list of config items
-type ConfigGet struct {
-	Config map[string]interface{} `json:"config"`
-}
+const (
+	// MaxUserdataSize is the maximum size the userdata of a container can take. The size
+	// of the userdata attached to a container has to be limited as a single element in our
+	// data store can only have a maximum size of 1.5 MB and we store the userdata as part
+	// of it.
+	MaxUserdataSize = 10 * units.KB
+)

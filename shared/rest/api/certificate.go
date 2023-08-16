@@ -19,13 +19,25 @@
 package api
 
 // CertificatesPost represents the fields of a new auth provided certificate
+//
+// swagger:model
 type CertificatesPost struct {
-	Certificate   string `json:"certificate" yaml:"certificate"`
+	// Base64 encoded certificate content without the header or the footer
+	// Example: MIIFUTCCAzmgAw...xjKoUEEQOzJ9
+	Certificate string `json:"certificate" yaml:"certificate"`
+	// TrustPassword is used to register a new client with the service
+	// Example: sUp3rs3cr3t
 	TrustPassword string `json:"trust-password,omitempty" yaml:"trust-password,omitempty"`
 }
 
 // Certificate represents an available client certificate
+//
+// swagger:model
 type Certificate struct {
+	// Base64 encoded certificate content without the header or the footer
+	// Example: MIIFUTCCAzmgAw...xjKoUEEQOzJ9
 	Certificate string `json:"certificate" yaml:"certificate"`
+	// SHA-256 fingerprint of the certificate
+	// Example: b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
 	Fingerprint string `json:"fingerprint" yaml:"fingerprint"`
 }

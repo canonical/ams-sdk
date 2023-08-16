@@ -39,11 +39,21 @@ addon-version:
 `
 
 // AddonVersion describes a single version of an addon
+//
+// swagger:model
 type AddonVersion struct {
-	Number      int    `json:"version" yaml:"version"`
+	// Version for the addon
+	// Example: 0
+	Number int `json:"version" yaml:"version"`
+	// SHA-256 fingerprint of the addon version
+	// Example: 0791cfc011f67c60b7bd0f852ddb686b79fa46083d9d43ef9845c9235c67b261
 	Fingerprint string `json:"fingerprint" yaml:"fingerprint"`
-	Size        int64  `json:"size" yaml:"size"`
-	CreatedAt   int64  `json:"created_at" yaml:"created_at"`
+	// Size (in bytes) of the addon payload
+	// Example: 529887868
+	Size int64 `json:"size" yaml:"size"`
+	// Creation timestamp of the addon
+	// Example: 1610641117
+	CreatedAt int64 `json:"created_at" yaml:"created_at"`
 }
 
 const swaggerModelAddon = `
@@ -59,16 +69,29 @@ addon:
 `
 
 // Addon describes a package with additional functionality to be added to containers
+//
+// swagger:model
 type Addon struct {
-	Name     string         `json:"name" yaml:"name"`
+	// Name of the addon
+	// Example: my-addon
+	Name string `json:"name" yaml:"name"`
+	// List of versions of the addon
 	Versions []AddonVersion `json:"versions" yaml:"versions"`
-	UsedBy   []string       `json:"used_by" yaml:"used_by"`
+	// List of applications using this addon
+	// Example: ["app1", "app2"]
+	UsedBy []string `json:"used_by" yaml:"used_by"`
 }
 
 // AddonsPost is used to create a new addon
+//
+// swagger:model
 type AddonsPost struct {
+	// Name of the addon
+	// Example: my-addon
 	Name string `json:"name" yaml:"name"`
 }
 
 // AddonPatch allows updating an existing addon with a new version
+//
+// swagger:model
 type AddonPatch struct{}

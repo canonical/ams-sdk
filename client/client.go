@@ -56,6 +56,7 @@ type Client interface {
 	RetrieveContainerByID(id string) (*api.Container, string, error)
 	UpdateContainerByID(id string, details *api.ContainerPatch, noWait bool) (restclient.Operation, error)
 	DeleteContainerByID(id string, force bool) (restclient.Operation, error)
+	DeleteContainers(ids []string, force bool) (restclient.Operation, error)
 	RetrieveContainerLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error
 	ExecuteContainer(id string, details *api.ContainerExecPost, args *ContainerExecArgs) (restclient.Operation, error)
 
@@ -72,6 +73,7 @@ type Client interface {
 	FindApplicationsByName(pattern string) ([]api.Application, error)
 	RetrieveApplicationByID(id string) (*api.Application, string, error)
 	DeleteApplicationByID(id string, force bool) (restclient.Operation, error)
+	DeleteApplications(ids []string, force bool) (restclient.Operation, error)
 	ExportApplicationByVersion(id string, version int, downloader func(header *http.Header, body io.ReadCloser) error) error
 	PublishApplicationVersion(id string, version int) (restclient.Operation, error)
 	RevokeApplicationVersion(id string, version int) (restclient.Operation, error)

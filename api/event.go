@@ -21,6 +21,8 @@ package api
 import "time"
 
 // EventType is used to describe the type of an event
+//
+// swagger:enum EventType
 type EventType string
 
 const (
@@ -31,13 +33,17 @@ const (
 )
 
 // Event defines the structure of an event sent on the events API endpoint
+//
+// swagger:model
 type Event struct {
 	// Type defines the type of event. Listeners can watch specific
 	// event types
 	Type EventType `json:"type"`
-	// Timestamp is filled when sending the event if empty
+	// Timestamp (in ISO8601 format) is filled when sending the event if empty
+	// Example: 2017-07-28T05:02:22.92201407Z
 	Timestamp time.Time `json:"timestamp"`
 	// Metadata represents the actual event data
+	// Example: { "class": "task", "created_at": "2017-07-28T05:02:22.92201407Z", "description": "Deleting container", "err": "", "id": "bc85137b-b20d-470a-a6ea-daa9a2b8506a", "may_cancel": false, "metadata": null, "resources": { "containers": [ "/1.0/containers/c0946voj1qm6t2783db0" ] }, "server_address": "", "status": "Success", "status_code": 200, "updated_at": "2017-07-28T05:02:22.92201407Z" }
 	Metadata interface{} `json:"metadata"`
 }
 

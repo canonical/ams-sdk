@@ -16,19 +16,18 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package api
+package constants
 
-// ConfigPost contains the field necessary to set or update a config item
-//
-// swagger:model
-type ConfigPost struct {
-	// Example: application.auto_publish
-	Name string `json:"name"`
-	// Example: false
-	Value string `json:"value"`
-}
+const (
+	// ApplicationNamePattern describes the regular expression to validate an
+	// application name
+	ApplicationNamePattern = `^([A-Za-z0-9_\-\.]*)$`
 
-// ConfigGet describes a list of config items
-type ConfigGet struct {
-	Config map[string]interface{} `json:"config"`
-}
+	// AddonNamePattern describes the regular expression to validate an
+	// addon name
+	AddonNamePattern = ApplicationNamePattern
+
+	// AndroidPackageNamePattern describes the regular expression to validate an
+	// Android package name
+	AndroidPackageNamePattern = `^([A-Za-z]{1}[A-Za-z\d_]*\.){1,}[A-Za-z][A-Za-z\d_]*$`
+)

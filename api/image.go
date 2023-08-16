@@ -55,47 +55,100 @@ func (s ImageStatus) String() string {
 }
 
 // ImageVersion describes a single version of an image
+//
+// swagger:model
 type ImageVersion struct {
-	Number      int         `json:"version" yaml:"version"`
-	Fingerprint string      `json:"fingerprint" yaml:"fingerprint"`
-	Size        int64       `json:"size" yaml:"size"`
-	CreatedAt   int64       `json:"created_at" yaml:"upload_time"`
-	StatusCode  ImageStatus `json:"status_code" yaml:"status_code"`
-	Status      string      `json:"status" yaml:"status"`
-	RemoteID    string      `json:"remote_id" yaml:"remote_id"`
+	// Version for the image
+	// Example: 0
+	Number int `json:"version" yaml:"version"`
+	// Fingerprint of the image version
+	// Example: 0791cfc011f67c60b7bd0f852ddb686b79fa46083d9d43ef9845c9235c67b261
+	Fingerprint string `json:"fingerprint" yaml:"fingerprint"`
+	// Size (in bytes) of the image version
+	// Example: 529887868
+	Size int64 `json:"size" yaml:"size"`
+	// Creation UTC timestamp of the image
+	// Example: 1610641117
+	CreatedAt int64 `json:"created_at" yaml:"upload_time"`
+	// Status of the image as an integer value
+	// Example: 3
+	StatusCode ImageStatus `json:"status_code" yaml:"status_code"`
+	// Current status of the image
+	// Enum: error,created,active,initializing,unknown
+	// Example: active
+	Status string `json:"status" yaml:"status"`
+	// Version of the image in the remote server
+	// Example: 1.2.3
+	RemoteID string `json:"remote_id" yaml:"remote_id"`
 }
 
 // Image represents an image available in AMS
+//
+// swagger:model
 type Image struct {
-	ID           string         `json:"id" yaml:"id"`
-	Name         string         `json:"name" yaml:"name"`
-	Versions     []ImageVersion `json:"versions" yaml:"versions"`
-	StatusCode   ImageStatus    `json:"status_code" yaml:"status_code"`
-	Status       string         `json:"status" yaml:"status"`
-	UsedBy       []string       `json:"used_by" yaml:"used_by"`
-	Immutable    bool           `json:"immutable" yaml:"immutable"`
-	Default      bool           `json:"default" yaml:"default"`
-	Architecture string         `json:"architecture,omitempty" yaml:"architecture,omitempty"`
+	// ID of the image
+	// Example: btavtegj1qm58qg7ru50
+	ID string `json:"id" yaml:"id"`
+	// Name of the image
+	// Example: my-image
+	Name string `json:"name" yaml:"name"`
+	// List of versions for the image
+	Versions []ImageVersion `json:"versions" yaml:"versions"`
+	// Status of the image as an integer value
+	// Example: 3
+	StatusCode ImageStatus `json:"status_code" yaml:"status_code"`
+	// Current status of the image
+	// Enum: error,created,active,initializing,unknown
+	// Example: active
+	Status string `json:"status" yaml:"status"`
+	// List of application ids using the image as a base
+	// Example: ["btavtegj1qm58asf123"]
+	UsedBy []string `json:"used_by" yaml:"used_by"`
+	// Flag to show whether the image can be edited by an AMS instance or not
+	// Example: false
+	Immutable bool `json:"immutable" yaml:"immutable"`
+	// Flag to show whether the image is used by default if no image name is provided
+	// Example: false
+	Default bool `json:"default" yaml:"default"`
+	// CPU architecture supported by the image
+	// Example: x86_64
+	Architecture string `json:"architecture,omitempty" yaml:"architecture,omitempty"`
 }
 
 // ImagesPost represents the fields to upload a new image
+//
+// swagger:model
 type ImagesPost struct {
-	Name    string `json:"name" yaml:"name"`
-	Path    string `json:"path" yaml:"path"`
-	Default bool   `json:"default" yaml:"default"`
+	// Name of the image
+	// Example: my-image
+	Name string `json:"name" yaml:"name"`
+	// Path to store the image
+	// Example: /save/image
+	Path string `json:"path" yaml:"path"`
+	// Make the image as default
+	// Example: false
+	Default bool `json:"default" yaml:"default"`
 }
 
 // ImagePatch represents the fields to update an existing image
+//
+// swagger:model
 type ImagePatch struct {
+	// Make the image as default
+	// Example: true
 	Default *bool `json:"default" yaml:"default"`
 }
 
 // ImagesGet represents a list of images
+//
+// swagger:model
 type ImagesGet struct {
 	Images []Image `json:"images" yaml:"images"`
 }
 
 // ImageDelete describes a request used to delete an image
+//
+// swagger:model
 type ImageDelete struct {
 	Force bool `json:"force"`
 }

@@ -35,6 +35,7 @@ type RegistryApplicationVersion struct {
 	Features     []string                     `json:"features" yaml:"features"`
 	Hooks        RegistryApplicationHooks     `json:"hooks" yaml:"hooks"`
 	Bootstrap    RegistryApplicationBootstrap `json:"bootstrap" yaml:"bootstrap"`
+	VideoEncoder string                       `json:"video_encoder" yaml:"video_encoder"`
 }
 
 // RegistryApplication describes a single application available in the registry

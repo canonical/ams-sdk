@@ -19,6 +19,8 @@
 package api
 
 // NodeStatus describes the current status of a node
+//
+// swagger:model
 type NodeStatus int
 
 const (
@@ -65,99 +67,279 @@ func (s *NodeStatus) String() string {
 }
 
 // NodeGPUAllocation describes a single allocation on a GPU
+//
+// swagger:model
 type NodeGPUAllocation struct {
-	GPUs         []uint64 `json:"gpus" yaml:"gpus"`
-	Slots        int      `json:"slots" yaml:"slots"`
-	EncoderSlots int      `json:"encoder_slots" yaml:"encoder_slots"`
+	// List of GPU IDs allocated to the container
+	// Example: [0,1]
+	GPUs []uint64 `json:"gpus" yaml:"gpus"`
+	// Number of GPU Slots allocated to the container
+	// Example: 1
+	Slots int `json:"slots" yaml:"slots"`
+	// Number of Encoder Slots allocated to the container
+	// Example: 1
+	EncoderSlots int `json:"encoder_slots" yaml:"encoder_slots"`
 }
 
 // NodeGPU describes a single GPU available on a node
+//
+// swagger:model
 type NodeGPU struct {
-	ID           uint64                       `json:"id" yaml:"id"`
-	PCIAddress   string                       `json:"pci_address" yaml:"pci_address"`
-	RenderName   string                       `json:"render_name" yaml:"render_name"`
-	Slots        int                          `json:"slots" yaml:"slots"`
-	EncoderSlots int                          `json:"encoder_slots" yaml:"encoder_slots"`
-	Allocations  map[string]NodeGPUAllocation `json:"allocations" yaml:"allocations"`
-	NUMANode     uint64                       `json:"numa_node" yaml:"numa_node"`
+	// ID of the GPU configured on the node
+	// Example: 0
+	ID uint64 `json:"id" yaml:"id"`
+	// PCI Bus Address used by the GPU
+	// Example: 00:08.0
+	PCIAddress string `json:"pci_address" yaml:"pci_address"`
+	// PCI Bus Address used by the GPU
+	// Example: D129
+	RenderName string `json:"render_name" yaml:"render_name"`
+	// Number of the GPU slots available
+	// Example: 20
+	Slots int `json:"slots" yaml:"slots"`
+	// Number of the encoder slots available on the GPU
+	// Example: 20
+	EncoderSlots int `json:"encoder_slots" yaml:"encoder_slots"`
+	// Map of current allocations and containers on the GPU
+	Allocations map[string]NodeGPUAllocation `json:"allocations" yaml:"allocations"`
+	// NUMA Node number for the GPU
+	// Example: 0
+	NUMANode uint64 `json:"numa_node" yaml:"numa_node"`
+}
+
+// NodeVPUAllocation describes a single allocation for a VPU
+//
+// swagger:model
+type NodeVPUAllocation struct {
+	// VPU IDs the allocation is for
+	IDs []uint64 `json:"ids" yaml:"ids"`
+	// Number of slots used by this allocation
+	Slots int `json:"slots" yaml:"slots"`
+}
+
+// NodeVPU describes a single independent VPU available on a node
+//
+// swagger:model
+type NodeVPU struct {
+	// ID of the VPU
+	ID uint64 `json:"id" yaml:"id"`
+	// Type of the VPU. Valid values are: unknown, netint
+	Type string `json:"type" yaml:"type"`
+	// Model name of the VPU
+	Model string `json:"model" yaml:"model"`
+	// NUMA node the card sits on
+	NUMANode uint64 `json:"numa_node" yaml:"numa_node"`
+	// Number of slots available on the VPU
+	Slots int `json:"slots" yaml:"slots"`
+	// Map of current allocations on the VPU
+	Allocations map[string]NodeVPUAllocation `json:"allocations" yaml:"allocations"`
 }
 
 // Node describes a single node of the underlying LXD cluster AMS manages
+//
+// swagger:model
 type Node struct {
-	Name                 string     `json:"name" yaml:"name"`
-	Address              string     `json:"address" yaml:"address"`
-	PublicAddress        string     `json:"public_address" yaml:"public_address"`
-	NetworkBridgeMTU     int        `json:"network_bridge_mtu" yaml:"network_bridge_mtu"`
-	CPUs                 int        `json:"cpus" yaml:"cpus"`
-	CPUAllocationRate    float32    `json:"cpu_allocation_rate" yaml:"cpu_allocation_rate"`
-	Memory               string     `json:"memory" yaml:"memory"`
-	MemoryAllocationRate float32    `json:"memory_allocation_rate" yaml:"memory_allocation_rate"`
-	StatusCode           NodeStatus `json:"status_code" yaml:"status_code"`
-	Status               string     `json:"status" yaml:"status"`
-	IsMaster             bool       `json:"is_master" yaml:"is_master"`
-	DiskSize             string     `json:"disk_size" yaml:"disk_size"`
-	GPUSlots             int        `json:"gpu_slots" yaml:"gpu_slots"`
-	GPUEncoderSlots      int        `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
-	Tags                 []string   `json:"tags" yaml:"tags"`
-	Unschedulable        bool       `json:"unschedulable" yaml:"unschedulable"`
-	Architecture         string     `json:"architecture,omitempty" yaml:"architecture,omitempty"`
-	StoragePool          string     `json:"storage_pool" yaml:"storage_pool"`
-	Managed              bool       `json:"managed" yaml:"managed"`
-	GPUs                 []NodeGPU  `json:"gpus" yaml:"gpus"`
+	// Name of the node
+	// Example: lxd0
+	Name string `json:"name" yaml:"name"`
+	// Internal IP address of the node
+	// Example: 10.0.0.1
+	// swagger:strfmt ipv4
+	Address string `json:"address" yaml:"address"`
+	// Public IP address of the node
+	// Example: 10.0.0.1
+	// swagger:strfmt ipv4
+	PublicAddress string `json:"public_address" yaml:"public_address"`
+	// MTU for the configured network bridge on LXD
+	// Example: 1500
+	NetworkBridgeMTU int `json:"network_bridge_mtu" yaml:"network_bridge_mtu"`
+	// Number of CPUs on the node
+	// Example: 4
+	CPUs int `json:"cpus" yaml:"cpus"`
+	// CPU allocation rate for the node
+	// Example: 4
+	CPUAllocationRate float32 `json:"cpu_allocation_rate" yaml:"cpu_allocation_rate"`
+	// Memory (in GB) of the LXD node
+	// Example: 8GB
+	Memory string `json:"memory" yaml:"memory"`
+	// Memory allocation rate for the node
+	// Example: 2
+	MemoryAllocationRate float32 `json:"memory_allocation_rate" yaml:"memory_allocation_rate"`
+	// Current status code of the node as an integer value
+	// Example: 4
+	StatusCode NodeStatus `json:"status_code" yaml:"status_code"`
+	// Current status of the node
+	// Example: online
+	Status string `json:"status" yaml:"status"`
+	// Flag to represent the master node for the AMS cluster
+	// Example: true
+	IsMaster bool `json:"is_master" yaml:"is_master"`
+	// Disk size for the node
+	// Example: true
+	DiskSize string `json:"disk_size" yaml:"disk_size"`
+	// Number of GPU slots present on the node
+	// Example: 0
+	GPUSlots int `json:"gpu_slots" yaml:"gpu_slots"`
+	// Number of GPU encoder slots present on the node
+	// Example: 0
+	GPUEncoderSlots int `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
+	// Tags attached to the node
+	// Example: ["created_by=anbox", "gpu=nvidia"]
+	Tags []string `json:"tags" yaml:"tags"`
+	// Flag used to see if the node is available to schedule containers
+	// Example: false
+	Unschedulable bool `json:"unschedulable" yaml:"unschedulable"`
+	// CPU architecture of the node
+	// Example: aarch64
+	Architecture string `json:"architecture,omitempty" yaml:"architecture,omitempty"`
+	// Name of the storage pool configured for the node
+	// Example: default
+	StoragePool string `json:"storage_pool" yaml:"storage_pool"`
+	// Flag used to control if AMS can manage the LXD node
+	// Example: false
+	Managed bool `json:"managed" yaml:"managed"`
+	// GPU information for the node
+	GPUs []NodeGPU `json:"gpus" yaml:"gpus"`
+	// VPU information for the node
+	VPUs []NodeVPU `json:"vpus" yaml:"vpus"`
 
+	// DEPRECATED Flag in favour of `unschedulable` flag
+	// Example: false
 	DEPRECATEDUnschedulable bool `json:"unscheduable" yaml:"unscheduable"`
 }
 
 // NodesPost describes a request to create a new node on AMS
+//
+// swagger:model
 type NodesPost struct {
-	Name                 string   `json:"name"`
-	Address              string   `json:"address"`
-	PublicAddress        string   `json:"public_address"`
-	TrustPassword        string   `json:"trust_password"`
-	NetworkBridgeMTU     int      `json:"network_bridge_mtu"`
-	StorageDevice        string   `json:"storage_device"`
-	CPUs                 int      `json:"cpus"`
-	CPUAllocationRate    float32  `json:"cpu_allocation_rate"`
-	Memory               string   `json:"memory"`
-	MemoryAllocationRate float32  `json:"memory_allocation_rate"`
-	GPUSlots             int      `json:"gpu_slots"`
-	GPUEncoderSlots      int      `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
-	Tags                 []string `json:"tags" yaml:"tags"`
-	Unmanaged            bool     `json:"unmanaged" yaml:"unmanaged"`
-	StoragePool          string   `json:"storage_pool" yaml:"storage_pool"`
-	NetworkName          string   `json:"network_name" yaml:"network_name"`
-	NetworkSubnet        string   `json:"network_subnet" yaml:"network_subnet"`
-	NetworkACLName       string   `json:"network_acl_name" yaml:"network_acl_name"`
+	// Name of the node
+	// Example: lxd0
+	Name string `json:"name"`
+	// Internal IP address of the node
+	// Example: 10.0.0.1
+	// swagger:strfmt ipv4
+	Address string `json:"address"`
+	// Public IP address of the node
+	// Example: 10.0.0.1
+	// swagger:strfmt ipv4
+	PublicAddress string `json:"public_address"`
+	// Trust password for the LXD instance
+	// Example: sUp3rs3cr3t
+	TrustPassword string `json:"trust_password"`
+	// MTU for the configured network bridge on LXD
+	// Example: 1500
+	NetworkBridgeMTU int `json:"network_bridge_mtu"`
+	// Storage device to use for configuring LXD storage pools
+	// Example: /dev/sdb
+	StorageDevice string `json:"storage_device"`
+	// Number of CPUs on the node
+	// Example: 4
+	CPUs int `json:"cpus"`
+	// CPU allocation rate for the node
+	// Example: 4
+	CPUAllocationRate float32 `json:"cpu_allocation_rate"`
+	// Memory (in GB) of the node
+	// Example: 8GB
+	Memory string `json:"memory"`
+	// Memory allocation rate for the node
+	// Example: 2
+	MemoryAllocationRate float32 `json:"memory_allocation_rate"`
+	// Number of GPU slots to configure on the node
+	// Example: 2
+	GPUSlots int `json:"gpu_slots"`
+	// Number of GPU encoder slots to configure on the node
+	// Example: 4
+	GPUEncoderSlots int `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
+	// Tags to attach to the node
+	// Example: ["created_by=anbox", "gpu=nvidia"]
+	Tags []string `json:"tags" yaml:"tags"`
+	// Flag used to control if AMS can manage the LXD node
+	// Example: false
+	Unmanaged bool `json:"unmanaged" yaml:"unmanaged"`
+	// Name of the storage pool to use for configuring the LXD node
+	// Example: default
+	StoragePool string `json:"storage_pool" yaml:"storage_pool"`
+	// Name of the network bridge to create on the LXD node
+	// Example: amsbr0
+	NetworkName string `json:"network_name" yaml:"network_name"`
+	// CIDR of the subnet to configure for the network bridge on LXD
+	// Example: 10.0.0.0/24
+	// swagger:strfmt ipv4
+	NetworkSubnet string `json:"network_subnet" yaml:"network_subnet"`
+	// Name of the network ACL to create on the LXD node
+	// Example: ams0
+	NetworkACLName string `json:"network_acl_name" yaml:"network_acl_name"`
 }
 
 // NodeGPUPatch allows changing configuration for individual GPUs
+//
+// swagger:model
 type NodeGPUPatch struct {
 	// ID must match the ID of an existing GPU and is used for identifying
 	// the GPU which should be patched
-	ID           uint64 `json:"id" yaml:"id"`
-	Slots        *int   `json:"slots" yaml:"slots"`
-	EncoderSlots *int   `json:"encoder_slots" yaml:"encoder_slots"`
+
+	// ID of the GPU configured on the node
+	// Example: 0
+	ID uint64 `json:"id" yaml:"id"`
+	// Update the number of the GPU slots available on the Node
+	// Example: 20
+	Slots *int `json:"slots" yaml:"slots"`
+	// Update the number of GPU encoder slots
+	// Example: 4
+	EncoderSlots *int `json:"encoder_slots" yaml:"encoder_slots"`
 }
 
 // NodePatch describes a request to update an existing node
+//
+// swagger:model
 type NodePatch struct {
-	PublicAddress        *string        `json:"public_address"`
-	CPUs                 *int           `json:"cpus"`
-	CPUAllocationRate    *float32       `json:"cpu_allocation_rate"`
-	Memory               *string        `json:"memory"`
-	MemoryAllocationRate *float32       `json:"memory_allocation_rate"`
-	GPUSlots             *int           `json:"gpu_slots"`
-	GPUEncoderSlots      *int           `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
-	Tags                 *[]string      `json:"tags" yaml:"tags"`
-	Unschedulable        *bool          `json:"unschedulable" yaml:"unschedulable"`
-	GPUs                 []NodeGPUPatch `json:"gpus" yaml:"gpus"`
-	Subnet               *string        `json:"subnet" yaml:"subnet"`
+	// Update the public IP Address of the node
+	// Example: 10.0.0.1
+	// swagger:strfmt ipv4
+	PublicAddress *string `json:"public_address"`
+	// Update the number of CPUs for the node
+	// Example: 4
+	CPUs *int `json:"cpus"`
+	// Update the CPU allocation rate for the node
+	// Example: 4
+	CPUAllocationRate *float32 `json:"cpu_allocation_rate"`
+	// Update the memory (in GB) for the node
+	// Example: 2GB
+	Memory *string `json:"memory"`
+	// Update the memory allocation rate for the node
+	// Example: 2
+	MemoryAllocationRate *float32 `json:"memory_allocation_rate"`
+	// Update the number of GPU slots to configure on the node
+	// Example: 2
+	GPUSlots *int `json:"gpu_slots"`
+	// Update the number of GPU encoder slots to configure on the node
+	// Example: 4
+	GPUEncoderSlots *int `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
+	// Update the tags of the node
+	// Example: ["created_by=anbox", "gpu=nvidia"]
+	Tags *[]string `json:"tags" yaml:"tags"`
+	// Flag used to remove the node from scheduler and not schedule containers on it
+	// Example: true
+	Unschedulable *bool          `json:"unschedulable" yaml:"unschedulable"`
+	GPUs          []NodeGPUPatch `json:"gpus" yaml:"gpus"`
+	// Update the subnet info of the node if the subnet of a node is changed
+	// Example: 10.0.0.1/24
+	// swagger:strfmt ipv4
+	Subnet *string `json:"subnet" yaml:"subnet"`
 
+	// DEPRECATED Flag in favour of `unschedulable` flag
+	// Example: false
 	DEPRECATEDUnschedulable *bool `json:"unscheduable" yaml:"unscheduable"`
 }
 
 // NodeDelete describes a request used to delete a node
+//
+// swagger:model
 type NodeDelete struct {
-	Force         bool `json:"force"`
+	// Use this to force deletion of a node from AMS and LXD cluster
+	// Example: true
+	Force bool `json:"force"`
+	// Use this to remove the node from the LXD cluster as well
+	// Example: true
 	KeepInCluster bool `json:"keep_in_cluster"`
 }

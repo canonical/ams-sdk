@@ -44,6 +44,9 @@ type ResponseRaw struct {
 type Response struct {
 	Type ResponseType `json:"type" yaml:"type"`
 
+	// Total Count of the collection
+	TotalSize *int `json:"total_size,omitempty" yaml:"total_size,omitempty"`
+
 	// Valid only for Sync responses
 	Status     string `json:"status" yaml:"status"`
 	StatusCode int    `json:"status_code" yaml:"status_code"`
