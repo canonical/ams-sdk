@@ -46,4 +46,5 @@ type RegistryApplication struct {
 	InstanceType  string                              `json:"instance_type" yaml:"instance_type"`
 	Tags          []string                            `json:"tags" yaml:"tags"`
 	Versions      map[int]*RegistryApplicationVersion `json:"versions" yaml:"versions"`
+	VM            bool                                `json:"vm" yaml:"vm"`
 }

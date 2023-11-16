@@ -63,6 +63,19 @@ const (
 	LifecycleEventActionContainerRemoved LifecycleEventAction = "container-removed"
 	// LifecycleEventActionContainerFailed is sent when a container failed
 	LifecycleEventActionContainerFailed LifecycleEventAction = "container-failed"
+
+	// LifecycleEventActionInstanceCreated is sent when an instance was created
+	LifecycleEventActionInstanceCreated LifecycleEventAction = "instance-created"
+	// LifecycleEventActionInstanceScheduled is sent when an instance was scheduled
+	LifecycleEventActionInstanceScheduled LifecycleEventAction = "instance-scheduled"
+	// LifecycleEventActionInstanceStarted is sent when an instance was started
+	LifecycleEventActionInstanceStarted LifecycleEventAction = "instance-started"
+	// LifecycleEventActionInstanceStopped is sent when an instance was stopped
+	LifecycleEventActionInstanceStopped LifecycleEventAction = "instance-stopped"
+	// LifecycleEventActionInstanceRemoved is sent when an instance was removed
+	LifecycleEventActionInstanceRemoved LifecycleEventAction = "instance-removed"
+	// LifecycleEventActionInstanceFailed is sent when an instance failed
+	LifecycleEventActionInstanceFailed LifecycleEventAction = "instance-failed"
 )
 
 // LifecycleEvent contains information about a lifecycle event

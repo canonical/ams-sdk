@@ -36,3 +36,13 @@ func (e ErrInvalidArgument) Error() string {
 func NewInvalidArgument(what string) ErrInvalidArgument {
 	return ErrInvalidArgument{content{what}}
 }
+
+// IsErrInvalidArgument checks if the given error is of type ErrInvalidArgument
+func IsErrInvalidArgument(err error) bool {
+	switch err.(type) {
+	case ErrInvalidArgument:
+		return true
+	default:
+		return false
+	}
+}

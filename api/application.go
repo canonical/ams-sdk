@@ -197,6 +197,7 @@ type ApplicationResources struct {
 	// Example: 2
 	GPUSlots int `json:"gpu-slots,omitempty" yaml:"gpu-slots,omitempty"`
 	// Number of VPU slots required by the application
+	// Example: 1
 	VPUSlots int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
 }
 
@@ -342,6 +343,8 @@ type Application struct {
 	// List of tags for filtering the nodes to run the application on
 	// Example: ["gpu=nvidia", "cpu=intel"]
 	NodeSelector []string `json:"node_selector" yaml:"node_selector"`
+	// Whether the application is based on virtual machines or containers
+	VM bool `json:"vm" yaml:"vm"`
 }
 
 // GetApplicationFilters returns an array of attributes available on the api to

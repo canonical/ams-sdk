@@ -42,6 +42,18 @@ type ContainerExecArgs struct {
 	DataDone chan bool
 }
 
+// ListContainersWithFilters lists all available containers the AMS service currently manages
+func (c *clientImpl) ListContainersWithFilters(filters []string) ([]api.Container, error) {
+	containers := []api.Container{}
+	params, err := convertFiltersToParams(filters)
+	if err != nil {
+		return containers, err
+	}
+	params["recursion"] = "1"
+	_, err = c.QueryStruct("GET", client.APIPath("containers"), params, nil, nil, "", &containers)
+	return containers, err
+}
+
 // ListContainers lists all available containers the AMS service currently manages
 func (c *clientImpl) ListContainers() ([]api.Container, error) {
 	containers := []api.Container{}

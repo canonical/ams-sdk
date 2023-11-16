@@ -38,6 +38,8 @@ const (
 	ImageStatusActive ImageStatus = 3
 	// ImageStatusDeleted represents the state an image is in when it is currently being deleted
 	ImageStatusDeleted ImageStatus = 4
+	// ImageStatusAvailable represents the state when an image is present on the remote but not in the LXD cluster
+	ImageStatusAvailable ImageStatus = 5
 )
 
 func (s ImageStatus) String() string {
@@ -46,6 +48,8 @@ func (s ImageStatus) String() string {
 		return "error"
 	case ImageStatusCreated:
 		return "created"
+	case ImageStatusAvailable:
+		return "available"
 	case ImageStatusActive:
 		return "active"
 	case ImageStatusInitializing:
@@ -82,6 +86,20 @@ type ImageVersion struct {
 	RemoteID string `json:"remote_id" yaml:"remote_id"`
 }
 
+// ImageType specifies the type of an image
+type ImageType string
+
+const (
+	// ImageTypeAny is used when the type of the image is not relevant
+	ImageTypeAny ImageType = ""
+	// ImageTypeUnknown is returned when the type of the image is not known
+	ImageTypeUnknown ImageType = "unknown"
+	// ImageTypeContainer specifies that the image is used for containers
+	ImageTypeContainer ImageType = "container"
+	// ImageTypeVM specifies that the image is used for virtual machines
+	ImageTypeVM ImageType = "vm"
+)
+
 // Image represents an image available in AMS
 //
 // swagger:model
@@ -113,6 +131,8 @@ type Image struct {
 	// CPU architecture supported by the image
 	// Example: x86_64
 	Architecture string `json:"architecture,omitempty" yaml:"architecture,omitempty"`
+	// Type of the image. Possible values are: container, vm
+	Type ImageType `json:"type" yaml:"type"`
 }
 
 // ImagesPost represents the fields to upload a new image
@@ -128,6 +148,11 @@ type ImagesPost struct {
 	// Make the image as default
 	// Example: false
 	Default bool `json:"default" yaml:"default"`
+	// Type specifies if the type of the to be imported image. Only valid
+	// when no image payload is provided with the request and the image
+	// is meant to be imported from a remote image server. If not specified
+	// all available image types will be imported.
+	Type ImageType `json:"type" yaml:"type"`
 }
 
 // ImagePatch represents the fields to update an existing image

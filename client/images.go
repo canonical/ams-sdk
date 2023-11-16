@@ -47,15 +47,21 @@ func (c *clientImpl) AddImage(name, packagePath string, isDefault bool, sentByte
 		Name:    name,
 		Default: isDefault,
 	}
-	return c.upload("POST", client.APIPath("images"), packagePath, details, sentBytes)
+	return c.upload("POST", client.APIPath("images"), nil, packagePath, details, sentBytes)
 }
 
 // ImportImage imports a new image from the image server
 func (c *clientImpl) ImportImage(name, path string, isDefault bool) (client.Operation, error) {
+	return c.ImportImageByType(name, path, api.ImageTypeAny, isDefault)
+}
+
+// ImportImageByType imports a new image of the given type from the image server
+func (c *clientImpl) ImportImageByType(name, path string, imgType api.ImageType, isDefault bool) (client.Operation, error) {
 	details := api.ImagesPost{
 		Name:    name,
 		Path:    path,
 		Default: isDefault,
+		Type:    imgType,
 	}
 
 	b, err := json.Marshal(&details)
@@ -72,7 +78,7 @@ func (c *clientImpl) ImportImage(name, path string, isDefault bool) (client.Oper
 // UpdateImage updates an existing image with the given payload
 func (c *clientImpl) UpdateImage(id, packagePath string, sentBytes chan float64) (client.Operation, error) {
 	details := api.ImagePatch{}
-	return c.upload("PATCH", client.APIPath("images", id), packagePath, details, sentBytes)
+	return c.upload("PATCH", client.APIPath("images", id), nil, packagePath, details, sentBytes)
 }
 
 func (c *clientImpl) SetDefaultImage(id string) error {

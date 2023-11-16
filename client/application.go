@@ -31,9 +31,31 @@ import (
 	"github.com/anbox-cloud/ams-sdk/shared/rest/client"
 )
 
+// ApplicationCreateArgs provides details on how to create a new application
+type ApplicationCreateArgs struct {
+	PackagePath   string
+	VM            bool
+	SentBytesChan chan float64
+}
+
 // CreateApplication creates a new application
 func (c *clientImpl) CreateApplication(packagePath string, sentBytes chan float64) (client.Operation, error) {
-	return c.upload("POST", client.APIPath("applications"), packagePath, nil, sentBytes)
+	return c.CreateApplicationWithArgs(&ApplicationCreateArgs{
+		PackagePath:   packagePath,
+		SentBytesChan: sentBytes,
+	})
+}
+
+// CreateApplicationWithArgs creates a new application based on the provided arguments
+func (c *clientImpl) CreateApplicationWithArgs(args *ApplicationCreateArgs) (client.Operation, error) {
+	if args.VM && !c.HasExtension("vm_support") {
+		return nil, errs.NewErrNotSupported("VM")
+	}
+	params := client.QueryParams{
+		"vm": strconv.FormatBool(args.VM),
+	}
+	return c.upload("POST", client.APIPath("applications"), params,
+		args.PackagePath, nil, args.SentBytesChan)
 }
 
 // UpdateApplicationWithDetails updates specific fields of an existing application
@@ -61,7 +83,7 @@ func (c *clientImpl) UpdateApplicationWithPackage(id, packagePath string, sentBy
 	if len(id) == 0 {
 		return nil, errs.NewInvalidArgument("id")
 	}
-	return c.upload("PATCH", client.APIPath("applications", id), packagePath, nil, sentBytes)
+	return c.upload("PATCH", client.APIPath("applications", id), nil, packagePath, nil, sentBytes)
 }
 
 // UpdateApplication updates an existing application
@@ -83,6 +105,16 @@ func (c *clientImpl) ListApplications() ([]api.Application, error) {
 	params := client.QueryParams{
 		"recursion": "1",
 	}
+	return c.queryApplications(params)
+}
+
+// ListApplicationsWithFilters lists all available applications using AMS's API level filters
+func (c *clientImpl) ListApplicationsWithFilters(filters []string) ([]api.Application, error) {
+	params, err := convertFiltersToParams(filters)
+	if err != nil {
+		return nil, err
+	}
+	params["recursion"] = "1"
 	return c.queryApplications(params)
 }
 

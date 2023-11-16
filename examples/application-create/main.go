@@ -59,24 +59,24 @@ func createApplication(c client.Client, packagePath string) error {
 	// sent to the server. This is useful to identify when all the
 	// payload has been sent.
 	sentBytesCh := make(chan float64)
-
-	operation, err := c.CreateApplication(packagePath, sentBytesCh)
-	if err != nil {
-		return err
-	}
-
-	// Simply print sent bytes to stdout
 	closeCh := make(chan struct{})
+
 	go func() {
 		for {
 			select {
 			case n := <-sentBytesCh:
+				// Simply print sent bytes to stdout
 				log.Printf("Sent: %v", n)
 			case <-closeCh:
 				return
 			}
 		}
 	}()
+
+	operation, err := c.CreateApplication(packagePath, sentBytesCh)
+	if err != nil {
+		return err
+	}
 
 	// Wait for create operation to finish
 	if err := operation.Wait(context.Background()); err != nil {

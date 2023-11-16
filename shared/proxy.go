@@ -16,7 +16,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 //
-// Taken from https://github.com/lxc/lxd/blob/master/shared/proxy.go under the
+// Taken from https://github.com/canonical/lxd/blob/master/shared/proxy.go under the
 // terms of Apache-2.0
 
 package shared

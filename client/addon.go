@@ -29,7 +29,7 @@ import (
 // AddAddon adds a new addon and uploads the given addon package to AMS
 func (c *clientImpl) AddAddon(name string, packagePath string, sentBytes chan float64) (client.Operation, error) {
 	details := api.AddonsPost{Name: name}
-	return c.upload("POST", client.APIPath("addons"), packagePath, details, sentBytes)
+	return c.upload("POST", client.APIPath("addons"), nil, packagePath, details, sentBytes)
 }
 
 // UpdateAddon updates an existing addon
@@ -38,7 +38,7 @@ func (c *clientImpl) UpdateAddon(name, packagePath string, sentBytes chan float6
 		return nil, errs.NewInvalidArgument("name")
 	}
 	details := api.AddonPatch{}
-	return c.upload("PATCH", client.APIPath("addons", name), packagePath, details, sentBytes)
+	return c.upload("PATCH", client.APIPath("addons", name), nil, packagePath, details, sentBytes)
 }
 
 // RetrieveAddon loads an addon from the connected AMS service

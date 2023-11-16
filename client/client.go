@@ -52,6 +52,7 @@ type Client interface {
 
 	// Containers
 	ListContainers() ([]api.Container, error)
+	ListContainersWithFilters(filters []string) ([]api.Container, error)
 	LaunchContainer(details *api.ContainersPost, noWait bool) (restclient.Operation, error)
 	RetrieveContainerByID(id string) (*api.Container, string, error)
 	UpdateContainerByID(id string, details *api.ContainerPatch, noWait bool) (restclient.Operation, error)
@@ -60,16 +61,29 @@ type Client interface {
 	RetrieveContainerLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error
 	ExecuteContainer(id string, details *api.ContainerExecPost, args *ContainerExecArgs) (restclient.Operation, error)
 
+	// Instances
+	ListInstances() ([]api.Instance, error)
+	ListInstancesWithFilters(filters []string) ([]api.Instance, error)
+	LaunchInstance(details *api.InstancesPost, noWait bool) (restclient.Operation, error)
+	RetrieveInstanceByID(id string) (*api.Instance, string, error)
+	UpdateInstanceByID(id string, details *api.InstancePatch, noWait bool) (restclient.Operation, error)
+	DeleteInstanceByID(id string, force bool) (restclient.Operation, error)
+	DeleteInstances(ids []string, force bool) (restclient.Operation, error)
+	RetrieveInstanceLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error
+	ExecuteInstance(id string, details *api.InstanceExecPost, args *InstanceExecArgs) (restclient.Operation, error)
+
 	// Config
 	SetConfigItem(name, value string) error
 	RetrieveConfigItems() (map[string]interface{}, error)
 
 	// Applications
 	CreateApplication(packagePath string, sentBytes chan float64) (restclient.Operation, error)
+	CreateApplicationWithArgs(args *ApplicationCreateArgs) (restclient.Operation, error)
 	UpdateApplicationWithPackage(id, packagePath string, sentBytes chan float64) (restclient.Operation, error)
 	UpdateApplicationWithDetails(id string, details api.ApplicationPatch) error
 	UpdateApplication(id string) (restclient.Operation, error)
 	ListApplications() ([]api.Application, error)
+	ListApplicationsWithFilters(filters []string) ([]api.Application, error)
 	FindApplicationsByName(pattern string) ([]api.Application, error)
 	RetrieveApplicationByID(id string) (*api.Application, string, error)
 	DeleteApplicationByID(id string, force bool) (restclient.Operation, error)
@@ -92,6 +106,7 @@ type Client interface {
 	AddImage(name, packagePath string, isDefault bool, sentBytes chan float64) (restclient.Operation, error)
 	UpdateImage(id, packagePath string, sentBytes chan float64) (restclient.Operation, error)
 	ImportImage(name, path string, isDefault bool) (client.Operation, error)
+	ImportImageByType(name, path string, imgType api.ImageType, isDefault bool) (client.Operation, error)
 	SetDefaultImage(id string) error
 	DeleteImageByIDOrName(id string, force bool) (restclient.Operation, error)
 	DeleteImageVersion(id string, version int) (restclient.Operation, error)
@@ -122,7 +137,8 @@ type Client interface {
 // various operations with the service
 type clientImpl struct {
 	restclient.Client
-	serviceStatus *api.ServiceStatus
+	serviceStatus      *api.ServiceStatus
+	hasInstanceSupport bool
 }
 
 // New creates a new client talking to the AMS service at the specified URL or unix.socket path
@@ -132,5 +148,9 @@ func New(addr interface{}, tlsConfig *tls.Config) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &clientImpl{Client: c}, nil
+
+	client := clientImpl{Client: c}
+	client.hasInstanceSupport = client.HasExtension("instance_support")
+
+	return &client, nil
 }

@@ -33,7 +33,7 @@ import (
 	"github.com/anbox-cloud/ams-sdk/shared/rest/client"
 )
 
-func (c *clientImpl) upload(httpOp, apiPath, packagePath string, details interface{}, sentBytes chan float64) (client.Operation, error) {
+func (c *clientImpl) upload(httpOp, apiPath string, params client.QueryParams, packagePath string, details interface{}, sentBytes chan float64) (client.Operation, error) {
 	if !c.HasExtension("zip_archive_support") {
 		if packages.IsZip(packagePath) {
 			return nil, errs.NewErrNotSupported("api extension \"zip_archive_support\"")
@@ -54,7 +54,7 @@ func (c *clientImpl) upload(httpOp, apiPath, packagePath string, details interfa
 	if details != nil {
 		request, err = json.Marshal(details)
 		if err != nil {
-			return nil, fmt.Errorf("Could not marshal request metadata: %v", err)
+			return nil, fmt.Errorf("could not marshal request metadata: %v", err)
 		}
 	}
 
@@ -67,7 +67,7 @@ func (c *clientImpl) upload(httpOp, apiPath, packagePath string, details interfa
 	u := &shared.BufferedReader{Reader: f, Size: sentBytes}
 
 	c.SetTransportTimeout(extendedTransportTimeout)
-	op, _, err := c.QueryOperation(httpOp, apiPath, nil, header, u, "")
+	op, _, err := c.QueryOperation(httpOp, apiPath, params, header, u, "")
 	c.SetTransportTimeout(client.DefaultTransportTimeout)
 	return op, err
 }
@@ -77,6 +77,18 @@ func (c *clientImpl) download(path string, params client.QueryParams, header htt
 	err := c.DownloadFile(path, params, header, downloader)
 	c.SetTransportTimeout(client.DefaultTransportTimeout)
 	return err
+}
+
+func convertFiltersToParams(filters []string) (client.QueryParams, error) {
+	apiFilters := client.QueryParams{}
+	for _, filter := range filters {
+		parts := strings.SplitN(filter, "=", 2)
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid filter '%s'", filter)
+		}
+		apiFilters[parts[0]] = parts[1]
+	}
+	return apiFilters, nil
 }
 
 func (c *clientImpl) rawWebsocket(url string) (*websocket.Conn, error) {
