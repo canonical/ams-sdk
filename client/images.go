@@ -102,6 +102,24 @@ func (c *clientImpl) SetDefaultImage(id string) error {
 	return op.Wait(context.Background())
 }
 
+func (c *clientImpl) TriggerImageSync(id string) error {
+	details := api.ImagePatch{
+		ForceSync: true,
+	}
+
+	b, err := json.Marshal(details)
+	if err != nil {
+		return fmt.Errorf("could not marshal request body: %v", err)
+	}
+
+	header := http.Header{"Content-Type": []string{"application/json"}}
+	op, _, err := c.QueryOperation("PATCH", client.APIPath("images", id), nil, header, bytes.NewReader(b), "")
+	if err != nil {
+		return err
+	}
+	return op.Wait(context.Background())
+}
+
 // DeleteImageByIDOrName deletes an image identified by the given id or name
 func (c *clientImpl) DeleteImageByIDOrName(id string, force bool) (client.Operation, error) {
 	if len(id) == 0 {

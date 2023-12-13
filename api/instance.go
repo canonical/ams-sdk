@@ -197,6 +197,9 @@ type Instance struct {
 	// ErrorMessage provides an error message when the instance status is set to error.
 	// Example: instance failed to boot
 	ErrorMessage string `json:"error_message" yaml:"error_message"`
+	// StatusMessage describes the current status of the instance
+	// Example: "Waiting for image download"
+	StatusMessage string `json:"status_message" yaml:"status_message"`
 	// Config summarizes the configuration the instance uses
 	Config struct {
 		// Platform specifies the Anbox platform the instance is running with

@@ -162,6 +162,10 @@ type ImagePatch struct {
 	// Make the image as default
 	// Example: true
 	Default *bool `json:"default" yaml:"default"`
+
+	// ForceSync forces synchronization of the image from the remote image server
+	// Examle: true
+	ForceSync bool `json:"force_sync" yaml:"force_sync"`
 }
 
 // ImagesGet represents a list of images

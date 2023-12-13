@@ -44,15 +44,15 @@ func (c *client) GetEvents() (*EventListener, error) {
 		return &listener, nil
 	}
 
-	// Initialize the list if needed
-	c.eventListeners = []*EventListener{}
-
 	// Setup a new connection with the server
 	resource := APIPath("events")
 	conn, err := c.dialWebsocket(c.composeWebsocketPath(resource))
 	if err != nil {
 		return nil, err
 	}
+
+	// Initialize the list if needed
+	c.eventListeners = []*EventListener{}
 
 	// Add the listener
 	c.eventListeners = append(c.eventListeners, &listener)
@@ -85,7 +85,7 @@ func (c *client) GetEvents() (*EventListener, error) {
 				}
 
 				// And remove them all from the list
-				c.eventListeners = []*EventListener{}
+				c.eventListeners = nil
 				return
 			}
 

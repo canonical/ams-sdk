@@ -112,6 +112,7 @@ type Client interface {
 	DeleteImageVersion(id string, version int) (restclient.Operation, error)
 	RetrieveImageByIDOrName(id string) (*api.Image, string, error)
 	RetrieveDefaultImage() (*api.Image, string, error)
+	TriggerImageSync(id string) error
 
 	// Services
 	RetrieveServiceStatus() (*api.ServiceStatus, string, error)
