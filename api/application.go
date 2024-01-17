@@ -203,8 +203,8 @@ type ApplicationResources struct {
 
 // ToApplicationResources returns a valid application resource from an application resource patch
 func (a *ApplicationResourcesPost) ToApplicationResources() ApplicationResources {
-	// NOTE: GPUSlots = 0 is a valid resource option, which means no gpu
-	// slot will be plugged for the container launching from the application
+	// NOTE: GPUSlots or VPUSlots = 0 is a valid resource option, which means no gpu
+	// or vpu slot will be plugged for the container launching from the application
 	resources := ApplicationResources{GPUSlots: -1, VPUSlots: -1}
 	if a.CPUs != nil && *a.CPUs > 0 {
 		resources.CPUs = *a.CPUs
