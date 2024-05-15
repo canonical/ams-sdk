@@ -241,6 +241,18 @@ type Instance struct {
 		DisableWatchdog bool `json:"disable_watchdog,omitempty" yaml:"disable_watchdog,omitempty"`
 		// DevMode specifies if development mode has been turned on for the instance
 		DevMode bool `json:"devmode,omitempty" yaml:"devmode,omitempty"`
+		// EnableStreaming specifies if streaming should be enabled for the instance or not
+		EnableStreaming bool `json:"enable_streaming,omitempty" yaml:"enable_streaming,omitempty"`
+		Display         struct {
+			// Width is the width of the virtual display
+			Width int `json:"width" yaml:"width"`
+			// Height is the height of the virtual display
+			Height int `json:"height" yaml:"height"`
+			// FPS is the frame rate of the virtual display
+			FPS int `json:"fps" yaml:"fps"`
+			// Density is the piel density of the virtual display
+			Density int `json:"density" yaml:"density"`
+		} `json:"display,omitempty" yaml:"display,omitempty"`
 	} `json:"config,omitempty"`
 	// Resources specifies the resources allocated for the instance
 	Resources InstanceResources `json:"resources,omitempty"`
@@ -276,6 +288,9 @@ func GetInstanceFilters() []string {
 //
 // swagger:model
 type InstancesPost struct {
+	// Name of the instance. Will be automatically assigned if not specified. Names
+	// must be unique.
+	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 	// Type of the instance (container, vm)
 	Type InstanceType `json:"type" yaml:"type"`
 	// ID of the application to use. Can be empty if an image ID is specified instead
@@ -342,7 +357,20 @@ type InstancesPost struct {
 		Features string `json:"features,omitempty" yaml:"features,omitempty"`
 		// DevMode specifies if development mode has been turned on for the instance
 		DevMode bool `json:"devmode,omitempty" yaml:"devmode,omitempty"`
-	} `json:"config,omitempty"`
+		// EnableStreaming specifies if streaming should be enabled for the instance or not
+		EnableStreaming bool `json:"enable_streaming,omitempty" yaml:"enable_streaming,omitempty"`
+		// Display specifies the configuration of the virutal display of the instance
+		Display struct {
+			// Width is the width of the virtual display
+			Width int `json:"width" yaml:"width"`
+			// Height is the height of the virtual display
+			Height int `json:"height" yaml:"height"`
+			// FPS is the frame rate of the virtual display
+			FPS int `json:"fps" yaml:"fps"`
+			// Density is the piel density of the virtual display
+			Density int `json:"density" yaml:"density"`
+		} `json:"display,omitempty" yaml:"display,omitempty"`
+	} `json:"config,omitempty" yaml:"config,omitempty"`
 	// Do not start the instance after creation.
 	NoStart bool `json:"no_start,omitempty" yaml:"no_start,omitempty"`
 }
