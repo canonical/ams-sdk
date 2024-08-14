@@ -21,7 +21,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/anbox-cloud/ams-sdk/internal/ams/shared"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
 )
 
 // InstanceStatus represents the status a instance can be in

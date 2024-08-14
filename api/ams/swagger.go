@@ -37,7 +37,7 @@ package api
 import (
 	"encoding/json"
 
-	"github.com/anbox-cloud/ams-sdk/internal/ams/shared/rest/api"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/api"
 )
 
 func SwaggerModels() []string {

@@ -25,8 +25,8 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/anbox-cloud/ams-sdk/internal/ams/client"
-	"github.com/anbox-cloud/ams-sdk/internal/ams/shared"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/client"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
 )
 
 // ConnectionCmd defines the options for an example to connect to the service

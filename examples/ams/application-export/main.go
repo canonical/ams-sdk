@@ -32,7 +32,7 @@ import (
 	"time"
 
 	"github.com/anbox-cloud/ams-sdk/examples/ams/common"
-	"github.com/anbox-cloud/ams-sdk/internal/ams/client"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/client"
 )
 
 type appExportCmd struct {

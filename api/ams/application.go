@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/anbox-cloud/ams-sdk/internal/ams/constants"
-	"github.com/anbox-cloud/ams-sdk/internal/ams/shared"
-	"github.com/anbox-cloud/ams-sdk/internal/ams/shared/errors"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/constants"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared/errors"
 )
 
 // ApplicationStatus represents the status an application can be in

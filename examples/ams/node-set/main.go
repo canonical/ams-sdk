@@ -28,8 +28,8 @@ import (
 
 	api "github.com/anbox-cloud/ams-sdk/api/ams"
 	"github.com/anbox-cloud/ams-sdk/examples/ams/common"
-	"github.com/anbox-cloud/ams-sdk/internal/ams/client"
-	"github.com/anbox-cloud/ams-sdk/internal/ams/shared"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/client"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
 )
 
 type nodeSetCmd struct {

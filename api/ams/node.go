@@ -268,7 +268,8 @@ type NodesPost struct {
 	NetworkSubnet string `json:"network_subnet" yaml:"network_subnet"`
 	// Name of the network ACL to create on the LXD node
 	// Example: ams0
-	NetworkACLName string `json:"network_acl_name" yaml:"network_acl_name"`
+	// Deprecated: This field is no longer supported since 1.23
+	DEPRECATEDNetworkACLName string `json:"network_acl_name" yaml:"network_acl_name"`
 }
 
 // NodeGPUPatch allows changing configuration for individual GPUs
