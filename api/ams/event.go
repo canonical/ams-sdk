@@ -57,6 +57,8 @@ const (
 	LifecycleEventActionContainerScheduled LifecycleEventAction = "container-scheduled"
 	// LifecycleEventActionContainerStarted is sent when a container was started
 	LifecycleEventActionContainerStarted LifecycleEventAction = "container-started"
+	// LifecycleEventActionContainerRunning is sent when a container is running
+	LifecycleEventActionContainerRunning LifecycleEventAction = "container-running"
 	// LifecycleEventActionContainerStopped is sent when a container was stopped
 	LifecycleEventActionContainerStopped LifecycleEventAction = "container-stopped"
 	// LifecycleEventActionContainerRemoved is sent when a container was removed
@@ -70,6 +72,8 @@ const (
 	LifecycleEventActionInstanceScheduled LifecycleEventAction = "instance-scheduled"
 	// LifecycleEventActionInstanceStarted is sent when an instance was started
 	LifecycleEventActionInstanceStarted LifecycleEventAction = "instance-started"
+	// LifecycleEventActionInstanceRunning is sent when an instance is running
+	LifecycleEventActionInstanceRunning LifecycleEventAction = "instance-running"
 	// LifecycleEventActionInstanceStopped is sent when an instance was stopped
 	LifecycleEventActionInstanceStopped LifecycleEventAction = "instance-stopped"
 	// LifecycleEventActionInstanceRemoved is sent when an instance was removed

@@ -26,9 +26,9 @@ import (
 	"strconv"
 
 	api "github.com/anbox-cloud/ams-sdk/api/ams"
-	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
 	errs "github.com/anbox-cloud/ams-sdk/pkg/ams/shared/errors"
 	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/client"
+	"github.com/anbox-cloud/ams-sdk/pkg/network"
 	"github.com/gorilla/websocket"
 )
 
@@ -212,8 +212,8 @@ func (c *clientImpl) ExecuteContainer(id string, details *api.ContainerExecPost,
 
 				// And attach stdin and stdout to it
 				go func() {
-					shared.WebsocketSendStream(conn, args.Stdin, -1)
-					<-shared.WebsocketRecvStream(args.Stdout, conn)
+					network.WebsocketSendStream(conn, args.Stdin, -1)
+					<-network.WebsocketRecvStream(args.Stdout, conn)
 					conn.Close()
 
 					if args.DataDone != nil {
@@ -237,7 +237,7 @@ func (c *clientImpl) ExecuteContainer(id string, details *api.ContainerExecPost,
 				}
 
 				conns = append(conns, conn)
-				dones[0] = shared.WebsocketSendStream(conn, args.Stdin, -1)
+				dones[0] = network.WebsocketSendStream(conn, args.Stdin, -1)
 			}
 
 			// Handle stdout
@@ -248,7 +248,7 @@ func (c *clientImpl) ExecuteContainer(id string, details *api.ContainerExecPost,
 				}
 
 				conns = append(conns, conn)
-				dones[1] = shared.WebsocketRecvStream(args.Stdout, conn)
+				dones[1] = network.WebsocketRecvStream(args.Stdout, conn)
 			}
 
 			// Handle stderr
@@ -259,7 +259,7 @@ func (c *clientImpl) ExecuteContainer(id string, details *api.ContainerExecPost,
 				}
 
 				conns = append(conns, conn)
-				dones[2] = shared.WebsocketRecvStream(args.Stderr, conn)
+				dones[2] = network.WebsocketRecvStream(args.Stderr, conn)
 			}
 
 			// Wait for everything to be done

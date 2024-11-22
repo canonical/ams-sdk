@@ -294,42 +294,53 @@ type NodeGPUPatch struct {
 //
 // swagger:model
 type NodePatch struct {
-	// Update the public IP Address of the node
+	// The public, reachable address of the node.
 	// Example: 10.0.0.1
 	// swagger:strfmt ipv4
 	PublicAddress *string `json:"public_address"`
-	// Update the number of CPUs for the node
+	// Number of CPUs dedicated to instances.
 	// Example: 4
 	CPUs *int `json:"cpus"`
-	// Update the CPU allocation rate for the node
+	// CPU allocation rate used for over-committing resources
 	// Example: 4
+	// Extensions:
+	// x-docs-ref: sec-over-committing
 	CPUAllocationRate *float32 `json:"cpu_allocation_rate"`
 	// Update the memory (in GB) for the node
 	// Example: 2GB
 	Memory *string `json:"memory"`
-	// Update the memory allocation rate for the node
+	// Memory allocation rate used for over-committing resources.
 	// Example: 2
+	// Extensions:
+	// x-docs-ref: sec-over-committing
 	MemoryAllocationRate *float32 `json:"memory_allocation_rate"`
 	// Update the number of GPU slots to configure on the node
 	// Example: 2
 	GPUSlots *int `json:"gpu_slots"`
-	// Update the number of GPU encoder slots to configure on the node
+	// Number of GPU encoder slots available on the node.
+	// `0` for nodes without GPU
+	// `32` for nodes with NVIDIA GPU
+	// `10` for nodes with AMD or Intel GPU
 	// Example: 4
+	// Extensions:
+	// x-docs-ref: sec-gpu-slots
 	GPUEncoderSlots *int `json:"gpu_encoder_slots" yaml:"gpu_encoder_slots"`
-	// Update the tags of the node
+	// Tags to identify the node.
 	// Example: ["created_by=anbox", "gpu=nvidia"]
 	Tags *[]string `json:"tags" yaml:"tags"`
-	// Flag used to remove the node from scheduler and not schedule containers on it
+	// When set to `true`, the node cannot be scheduled, which prevents new instances from being launched on it.
 	// Example: true
 	Unschedulable *bool          `json:"unschedulable" yaml:"unschedulable"`
 	GPUs          []NodeGPUPatch `json:"gpus" yaml:"gpus"`
-	// Update the subnet info of the node if the subnet of a node is changed
+	// The network subnet of the machine where the node runs.
 	// Example: 10.0.0.1/24
 	// swagger:strfmt ipv4
 	Subnet *string `json:"subnet" yaml:"subnet"`
 
 	// DEPRECATED Flag in favour of `unschedulable` flag
 	// Example: false
+	// Extensions:
+	// x-deprecated-since: "1.20"
 	DEPRECATEDUnschedulable *bool `json:"unscheduable" yaml:"unscheduable"`
 }
 

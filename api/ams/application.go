@@ -345,6 +345,9 @@ type Application struct {
 	NodeSelector []string `json:"node_selector" yaml:"node_selector"`
 	// Whether the application is based on virtual machines or containers
 	VM bool `json:"vm" yaml:"vm"`
+	// Parent image variant that the application is based on
+	// Example: android
+	ParentImageVariant string `json:"parent_image_variant" yaml:"parent_image_variant"`
 }
 
 // GetApplicationFilters returns an array of attributes available on the api to
@@ -362,6 +365,7 @@ func GetApplicationFilters() []string {
 		"addons",
 		"inhibit_auto_updates",
 		"tags",
+		"parent_image_variant",
 	}
 }
 

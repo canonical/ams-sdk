@@ -44,21 +44,3 @@ func DumpData(data interface{}) error {
 	fmt.Fprintf(os.Stdout, string(b))
 	return nil
 }
-
-// GetByteSizeString returns the size in a human readable format
-func GetByteSizeString(input int64, precision uint) string {
-	if input < 1024 {
-		return fmt.Sprintf("%dB", input)
-	}
-
-	value := float64(input)
-
-	for _, unit := range []string{"kB", "MB", "GB", "TB", "PB", "EB"} {
-		value = value / 1024
-		if value < 1024 {
-			return fmt.Sprintf("%.*f%s", precision, value, unit)
-		}
-	}
-
-	return fmt.Sprintf("%.*fEB", precision, value)
-}

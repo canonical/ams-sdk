@@ -16,18 +16,18 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package shared
+package network
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -54,27 +54,9 @@ func RFC3493Dialer(network, address string) (net.Conn, error) {
 	return nil, fmt.Errorf("Unable to connect to: " + address)
 }
 
-// InitTLSConfig returns a tls.Config populated with default encryption
-// parameters. This is used as baseline config server certificate
-func InitTLSConfig() *tls.Config {
-	return &tls.Config{
-		MinVersion: tls.VersionTLS12,
-		CipherSuites: []uint16{
-			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-			tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-		},
-	}
-}
-
-// InitTLS13Config returns a tls.Config populated with TLS1.3
+// InitTLSConfig returns a tls.Config populated with TLS1.3
 // as the minimum TLS version for TLS configuration
-func InitTLS13Config() *tls.Config {
+func InitTLSConfig() *tls.Config {
 	return &tls.Config{
 		MinVersion: tls.VersionTLS13,
 	}
@@ -101,19 +83,11 @@ func finalizeTLSConfig(tlsConfig *tls.Config, tlsRemoteCert *x509.Certificate) {
 			tlsConfig.ServerName = tlsRemoteCert.DNSNames[0]
 		}
 	}
-
-	tlsConfig.BuildNameToCertificate()
 }
 
 // GetTLSConfig returns a tls 1.2 config
 func GetTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, tlsRemoteCert *x509.Certificate) (*tls.Config, error) {
 	tlsConfig := InitTLSConfig()
-	return getTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile, tlsRemoteCert, tlsConfig)
-}
-
-// GetTLS13Config returns a tls 1.3 config
-func GetTLS13Config(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, tlsRemoteCert *x509.Certificate) (*tls.Config, error) {
-	tlsConfig := InitTLS13Config()
 	return getTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile, tlsRemoteCert, tlsConfig)
 }
 
@@ -129,7 +103,7 @@ func getTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, t
 	}
 
 	if tlsClientCAFile != "" {
-		caCertificates, err := ioutil.ReadFile(tlsClientCAFile)
+		caCertificates, err := os.ReadFile(tlsClientCAFile)
 		if err != nil {
 			return nil, err
 		}
@@ -144,52 +118,51 @@ func getTLSConfig(tlsClientCertFile, tlsClientKeyFile, tlsClientCAFile string, t
 	return tlsConfig, nil
 }
 
-// GetTLSConfigMem returns a tls config
-func GetTLSConfigMem(tlsClientCert string, tlsClientKey string, tlsClientCA string, tlsRemoteCertPEM string, insecureSkipVerify, useTLS12 bool) (*tls.Config, error) {
-	tlsConfig := InitTLS13Config()
-	if useTLS12 {
-		tlsConfig = InitTLSConfig()
-	}
-	tlsConfig.InsecureSkipVerify = insecureSkipVerify
-	// Client authentication
-	if tlsClientCert != "" && tlsClientKey != "" {
-		cert, err := tls.X509KeyPair([]byte(tlsClientCert), []byte(tlsClientKey))
-		if err != nil {
-			return nil, err
-		}
+// ListAvailableAddresses returns a list of IPv4 network addresses the host has.
+// It ignores the loopback device
+func ListAvailableAddresses() ([]string, error) {
+	ret := []string{}
 
-		tlsConfig.Certificates = []tls.Certificate{cert}
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return nil, err
 	}
 
-	var tlsRemoteCert *x509.Certificate
-	if tlsRemoteCertPEM != "" {
-		// Ignore any content outside of the PEM bytes we care about
-		certBlock, _ := pem.Decode([]byte(tlsRemoteCertPEM))
-		if certBlock == nil {
-			return nil, fmt.Errorf("Invalid remote certificate")
-		}
-
-		var err error
-		tlsRemoteCert, err = x509.ParseCertificate(certBlock.Bytes)
-		if err != nil {
-			return nil, err
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !(ipnet.IP.IsLoopback() || ipnet.IP.IsLinkLocalUnicast()) {
+			if ipnet.IP.To4() != nil {
+				ret = append(ret, ipnet.IP.String())
+			}
 		}
 	}
 
-	if tlsClientCA != "" {
-		caPool := x509.NewCertPool()
-		caPool.AppendCertsFromPEM([]byte(tlsClientCA))
+	return ret, nil
+}
 
-		tlsConfig.RootCAs = caPool
+// GetLocalIP returns the first non loopback address of the system we're running on
+func GetLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
 	}
-
-	finalizeTLSConfig(tlsConfig, tlsRemoteCert)
-
-	return tlsConfig, nil
+	for _, address := range addrs {
+		// check the address type and if it is not a loopback the display it
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
 }
 
 // WebsocketSendStream manages the send stream of the websocket
 func WebsocketSendStream(conn *websocket.Conn, r io.Reader, bufferSize int) chan bool {
+	return WebsocketSendStreamWithContext(context.Background(), conn, r, bufferSize)
+}
+
+// WebsocketSendStreamWithContext manages the send stream of the websocket
+func WebsocketSendStreamWithContext(ctx context.Context, conn *websocket.Conn, r io.Reader, bufferSize int) chan bool {
 	ch := make(chan bool)
 
 	if r == nil {
@@ -197,30 +170,36 @@ func WebsocketSendStream(conn *websocket.Conn, r io.Reader, bufferSize int) chan
 		return ch
 	}
 
-	go func(conn *websocket.Conn, r io.Reader) {
+	go func(ctx context.Context, conn *websocket.Conn, r io.Reader) {
 		in := ReaderToChannel(r, bufferSize)
-		for {
-			buf, ok := <-in
-			if !ok {
-				break
-			}
+		active := true
+		for active {
+			select {
+			case buf, ok := <-in:
+				if !ok {
 
-			w, err := conn.NextWriter(websocket.BinaryMessage)
-			if err != nil {
-				log.Printf("Got error getting next writer %s", err)
-				break
-			}
+					active = false
+					break
+				}
 
-			_, err = w.Write(buf)
-			w.Close()
-			if err != nil {
-				log.Printf("Got err writing %s", err)
-				break
+				w, err := conn.NextWriter(websocket.BinaryMessage)
+				if err != nil {
+					log.Printf("Got error getting next writer %s", err)
+					active = false
+					break
+				}
+
+				_, err = w.Write(buf)
+				w.Close()
+				if err != nil {
+					log.Printf("Got err writing %s", err)
+				}
+			case <-ctx.Done():
+				active = false
 			}
 		}
-		conn.WriteMessage(websocket.TextMessage, []byte{})
 		ch <- true
-	}(conn, r)
+	}(ctx, conn, r)
 
 	return ch
 }
@@ -232,6 +211,14 @@ func WebsocketRecvStream(w io.Writer, conn *websocket.Conn) chan bool {
 	go func(w io.Writer, conn *websocket.Conn) {
 		for {
 			mt, r, err := conn.NextReader()
+			if err != nil {
+				switch err.(type) {
+				case *websocket.CloseError:
+				default:
+				}
+				break
+			}
+
 			if mt == websocket.CloseMessage {
 				log.Printf("Got close message for reader")
 				break
@@ -242,16 +229,7 @@ func WebsocketRecvStream(w io.Writer, conn *websocket.Conn) chan bool {
 				break
 			}
 
-			if err != nil {
-				switch err.(type) {
-				case *websocket.CloseError:
-				default:
-					log.Printf("Got error getting next reader %s, %s", err, w)
-				}
-				break
-			}
-
-			buf, err := ioutil.ReadAll(r)
+			buf, err := io.ReadAll(r)
 			if err != nil {
 				log.Printf("Got error writing to writer %s", err)
 				break
@@ -373,16 +351,16 @@ func ReaderToChannel(r io.Reader, bufferSize int) <-chan []byte {
 		for {
 			read := buf[offset : offset+readSize]
 			nr, err := r.Read(read)
-			offset += nr
-			if offset > 0 && (offset+readSize >= bufferSize || err != nil) {
-				ch <- buf[0:offset]
-				offset = 0
-				buf = make([]byte, bufferSize)
-			}
-
 			if err != nil {
 				close(ch)
 				break
+			}
+
+			offset += nr
+			if offset > 0 && (offset+readSize >= bufferSize) {
+				ch <- buf[0:offset]
+				offset = 0
+				buf = make([]byte, bufferSize)
 			}
 		}
 	}()
@@ -408,7 +386,7 @@ func defaultWriter(conn *websocket.Conn, w io.WriteCloser, writeDone chan<- bool
 			break
 		}
 
-		buf, err := ioutil.ReadAll(r)
+		buf, err := io.ReadAll(r)
 		if err != nil {
 			log.Printf("Got error writing to writer %s", err)
 			break
@@ -501,25 +479,4 @@ func WebsocketConsoleMirror(conn *websocket.Conn, w io.WriteCloser, r io.ReadClo
 // WebsocketUpgrader websocket.Upgrader
 var WebsocketUpgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
-}
-
-// ListAvailableAddresses returns a list of IPv4 network addresses the host has.
-// It ignores the loopback device
-func ListAvailableAddresses() ([]string, error) {
-	ret := []string{}
-
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, addr := range addrs {
-		if ipnet, ok := addr.(*net.IPNet); ok && !(ipnet.IP.IsLoopback() || ipnet.IP.IsLinkLocalUnicast()) {
-			if ipnet.IP.To4() != nil {
-				ret = append(ret, ipnet.IP.String())
-			}
-		}
-	}
-
-	return ret, nil
 }

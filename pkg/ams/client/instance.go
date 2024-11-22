@@ -26,9 +26,9 @@ import (
 	"strconv"
 
 	api "github.com/anbox-cloud/ams-sdk/api/ams"
-	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
 	errs "github.com/anbox-cloud/ams-sdk/pkg/ams/shared/errors"
 	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/client"
+	"github.com/anbox-cloud/ams-sdk/pkg/network"
 	"github.com/gorilla/websocket"
 )
 
@@ -319,8 +319,8 @@ func (c *clientImpl) ExecuteInstance(id string, details *api.InstanceExecPost, a
 
 				// And attach stdin and stdout to it
 				go func() {
-					shared.WebsocketSendStream(conn, args.Stdin, -1)
-					<-shared.WebsocketRecvStream(args.Stdout, conn)
+					network.WebsocketSendStream(conn, args.Stdin, -1)
+					<-network.WebsocketRecvStream(args.Stdout, conn)
 					conn.Close()
 
 					if args.DataDone != nil {
@@ -335,6 +335,7 @@ func (c *clientImpl) ExecuteInstance(id string, details *api.InstanceExecPost, a
 		} else {
 			dones := map[int]chan bool{}
 			conns := []*websocket.Conn{}
+			waitConns := 0
 
 			// Handle stdin
 			if fds["0"] != "" {
@@ -344,7 +345,7 @@ func (c *clientImpl) ExecuteInstance(id string, details *api.InstanceExecPost, a
 				}
 
 				conns = append(conns, conn)
-				dones[0] = shared.WebsocketSendStream(conn, args.Stdin, -1)
+				dones[0] = network.WebsocketSendStream(conn, args.Stdin, -1)
 			}
 
 			// Handle stdout
@@ -355,7 +356,8 @@ func (c *clientImpl) ExecuteInstance(id string, details *api.InstanceExecPost, a
 				}
 
 				conns = append(conns, conn)
-				dones[1] = shared.WebsocketRecvStream(args.Stdout, conn)
+				dones[1] = network.WebsocketRecvStream(args.Stdout, conn)
+				waitConns++
 			}
 
 			// Handle stderr
@@ -366,25 +368,36 @@ func (c *clientImpl) ExecuteInstance(id string, details *api.InstanceExecPost, a
 				}
 
 				conns = append(conns, conn)
-				dones[2] = shared.WebsocketRecvStream(args.Stderr, conn)
+				dones[2] = network.WebsocketRecvStream(args.Stderr, conn)
+				waitConns++
 			}
 
 			// Wait for everything to be done
 			go func() {
-				for i, chDone := range dones {
-					// Skip stdin, dealing with it separately below
-					if i == 0 {
-						continue
+				for {
+					select {
+					case <-dones[0]:
+						// Handle stdin finish, but don't wait for it
+						dones[0] = nil
+						_ = conns[0].Close()
+					case <-dones[1]:
+						dones[1] = nil
+						_ = conns[1].Close()
+						waitConns--
+					case <-dones[2]:
+						dones[2] = nil
+						_ = conns[2].Close()
+						waitConns--
 					}
-					<-chDone
-				}
 
-				if fds["0"] != "" {
-					args.Stdin.Close()
-				}
+					if waitConns <= 0 {
+						// Close stdin websocket if defined and not already closed.
+						if dones[0] != nil {
+							conns[0].Close()
+						}
 
-				for _, conn := range conns {
-					conn.Close()
+						break
+					}
 				}
 
 				if args.DataDone != nil {

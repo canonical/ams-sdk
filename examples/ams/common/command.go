@@ -26,7 +26,7 @@ import (
 	"os"
 
 	"github.com/anbox-cloud/ams-sdk/pkg/ams/client"
-	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
+	"github.com/anbox-cloud/ams-sdk/pkg/network"
 )
 
 // ConnectionCmd defines the options for an example to connect to the service
@@ -89,7 +89,7 @@ func (c *ConnectionCmd) NewClient() client.Client {
 		log.Fatal(err)
 	}
 
-	serverCert, err := shared.GetRemoteCertificate(c.ServiceURL)
+	serverCert, err := network.GetRemoteCertificate(c.ServiceURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func (c *ConnectionCmd) NewClient() client.Client {
 	// certificate files.
 	// Server must have client cert amongst trusted client certificates before
 	// connecting
-	tlsConfig, err := shared.GetTLSConfig(c.ClientCert, c.ClientKey, "", serverCert)
+	tlsConfig, err := network.GetTLSConfig(c.ClientCert, c.ClientKey, "", serverCert)
 	if err != nil {
 		log.Fatal(err)
 	}

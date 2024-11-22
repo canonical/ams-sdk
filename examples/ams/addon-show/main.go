@@ -26,6 +26,7 @@ import (
 
 	"github.com/anbox-cloud/ams-sdk/examples/ams/common"
 	"github.com/anbox-cloud/ams-sdk/pkg/ams/client"
+	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared"
 )
 
 type addonShowCmd struct {
@@ -74,7 +75,7 @@ func showAddon(c client.Client, name string) error {
 	for _, v := range addon.Versions {
 		t := time.Unix(v.CreatedAt, 0)
 		outputData.Versions[v.Number] = addonVersion{
-			Size:      common.GetByteSizeString(v.Size, 2),
+			Size:      shared.GetByteSizeString(v.Size, 2),
 			CreatedAt: t.String(),
 		}
 	}

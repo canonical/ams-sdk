@@ -157,7 +157,7 @@ solution involving a few lines of code:
         "os"
 
         "github.com/anbox-cloud/ams-sdk/client"
-        "github.com/anbox-cloud/ams-sdk/shared"
+        "github.com/canonical/ams/pkg/network"
     )
 
     func main() {
@@ -174,13 +174,13 @@ solution involving a few lines of code:
             os.Exit(1)
         }
 
-        serverCert, err := shared.GetRemoteCertificate(serviceURL)
+        serverCert, err := network.GetRemoteCertificate(serviceURL)
         if err != nil {
             fmt.Println("Failed to get remote certificates")
             os.Exit(1)
         }
 
-        tlsConfig, err := shared.GetTLSConfig(clientCert, clientKey, "", serverCert)
+        tlsConfig, err := network.GetTLSConfig(clientCert, clientKey, "", serverCert)
         if err != nil {
             fmt.Println("Failed to get TLS config")
             os.Exit(1)
@@ -193,9 +193,7 @@ solution involving a few lines of code:
 !!!Note:
     Here, we take any server certificate as valid. In case you want a better compromise
     on the client side with the server certificate to trust, you simply have to 
-    replace `shared.GetRemoteCertificate(serviceURL)` method with code to read a
-    server well-known certificate from a remote or local path to a x509 object and pass
-    it to `shared.GetTLSConfig()` method.
+    replace `network.GetRemoteCertificate(serviceURL)` method with code to read a server well-known certificate from a remote or local path to a x509 object and pass it to `network.GetTLSConfig()` method.
 
 Once the TLS configuration is ready, the next step is to create the REST client object:
 
