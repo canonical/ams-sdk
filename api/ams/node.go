@@ -88,6 +88,9 @@ type NodeGPU struct {
 	// ID of the GPU configured on the node
 	// Example: 0
 	ID uint64 `json:"id" yaml:"id"`
+	// Type is the type of the GPU. Possible values are: nvidia, amd, intel
+	// Example: nvidia
+	Type string `json:"type" yaml:"type"`
 	// PCI Bus Address used by the GPU
 	// Example: 00:08.0
 	PCIAddress string `json:"pci_address" yaml:"pci_address"`
@@ -266,6 +269,10 @@ type NodesPost struct {
 	// Example: 10.0.0.0/24
 	// swagger:strfmt ipv4
 	NetworkSubnet string `json:"network_subnet" yaml:"network_subnet"`
+	// Trust token for the LXD instance
+	// Example: csdflkj3lks
+	TrustToken string `json:"trust_token"`
+
 	// Name of the network ACL to create on the LXD node
 	// Example: ams0
 	// Deprecated: This field is no longer supported since 1.23

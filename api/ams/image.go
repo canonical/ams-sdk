@@ -86,6 +86,9 @@ type ImageVersion struct {
 	// Version of the image in the remote server
 	// Example: 1.2.3
 	RemoteID string `json:"remote_id" yaml:"remote_id"`
+	// ErrorMessage describes a potential error which has occured while
+	// downloading the image.
+	ErrorMessage string `json:"error_message,omitempty" yaml:"error_message,omitempty"`
 }
 
 // ImageType specifies the type of an image
