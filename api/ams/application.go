@@ -136,29 +136,29 @@ type ApplicationVersion struct {
 	CreatedAt int64 `json:"created_at" yaml:"created_at"`
 	// Name of the boot package for the version
 	// Example: com.foo.bar.MainActivity
-	BootActivity string `json:"boot_activity" yaml:"boot-activity"`
+	BootActivity string `json:"boot_activity,omitempty" yaml:"boot-activity,omitempty"`
 	// Required android application permissions
 	// Example: ["android.permission.WRITE_EXTERNAL_STORAGE","android.permission.READ_EXTERNAL_STORAGE"]
-	RequiredPermissions []string `json:"required_permissions" yaml:"required_permissions"`
+	RequiredPermissions []string `json:"required_permissions,omitempty" yaml:"required_permissions,omitempty"`
 	// List of addons enabled for the version
-	Addons []ApplicationAddon `json:"addons" yaml:"addons"`
+	Addons []ApplicationAddon `json:"addons,omitempty" yaml:"addons,omitempty"`
 	// Extra data to be setup on the instance on application creation
 	// Example: {}
-	ExtraData map[string]ApplicationExtraData `json:"extra_data" yaml:"extra_data"`
+	ExtraData map[string]ApplicationExtraData `json:"extra_data,omitempty" yaml:"extra_data,omitempty"`
 	// Error message in case the application ran into an error
 	// Example: {}
-	ErrorMessage string `json:"error_message" yaml:"error_message"`
+	ErrorMessage string `json:"error_message,omitempty" yaml:"error_message,omitempty"`
 	// Encoder type to use for the application
 	// Enum: [ gpu, gpu-preferred, software, unknown ]
 	// Example: gpu
 	VideoEncoder VideoEncoderType `json:"video_encoder,omitempty" yaml:"video-encoder,omitempty"`
 	// Watchdog settings for the application
-	Watchdog ApplicationWatchdog `json:"watchdog" yaml:"watchdog"`
+	Watchdog ApplicationWatchdog `json:"watchdog,omitempty" yaml:"watchdog,omitempty"`
 	// List of services exposed by the application that should be exposed on the instance
 	Services []NetworkServiceSpec `json:"services,omitempty" yaml:"services,omitempty"`
 	// List of features supported by the application
 	// Example: ["feature1", "feature2"]
-	Features []string `json:"features" yaml:"features"`
+	Features []string `json:"features,omitempty" yaml:"features,omitempty"`
 	// Hook settings for the application
 	Hooks ApplicationHooks `json:"hooks,omitempty" yaml:"hooks,omitempty"`
 	// Boostrap settings for the application
@@ -254,7 +254,7 @@ type ApplicationWatchdog struct {
 	Disabled bool `json:"disabled" yaml:"disabled"`
 	// List of android packages to enable the watchdog for
 	// Example: ["com.android.settings"]
-	AllowedPackages []string `json:"allowed-packages" yaml:"allowed-packages"`
+	AllowedPackages []string `json:"allowed-packages,omitempty" yaml:"allowed-packages,omitempty"`
 }
 
 // ValidateAllowedPackages checks the value for given allowed packages
@@ -322,7 +322,7 @@ type Application struct {
 	Versions []ApplicationVersion `json:"versions" yaml:"versions"`
 	// List of addons enabled for the application
 	// Example: ["ssh", "gms"]
-	Addons []string `json:"addons" yaml:"addons"`
+	Addons []string `json:"addons,omitempty" yaml:"addons,omitempty"`
 	// Creation UTC timestamp of the application
 	// Example: 1532150640
 	CreatedAt int64 `json:"created_at" yaml:"created_at"`
@@ -331,7 +331,7 @@ type Application struct {
 	Immutable bool `json:"immutable" yaml:"immutable"`
 	// Tags to attach to the application
 	// Example: ["created_by=anbox"]
-	Tags []string `json:"tags" yaml:"tags"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty"`
 	// Resources required by the application. Overrides the instance_type requirements.
 	Resources ApplicationResources `json:"resources,omitempty" yaml:"resources,omitempty"`
 	// ABI supported by the application
@@ -342,7 +342,7 @@ type Application struct {
 	InhibitAutoUpdates bool `json:"inhibit_auto_updates" yaml:"inhibit_auto_updates"`
 	// List of tags for filtering the nodes to run the application on
 	// Example: ["gpu=nvidia", "cpu=intel"]
-	NodeSelector []string `json:"node_selector" yaml:"node_selector"`
+	NodeSelector []string `json:"node_selector,omitempty" yaml:"node_selector,omitempty"`
 	// Whether the application is based on virtual machines or containers
 	VM bool `json:"vm" yaml:"vm"`
 	// Parent image variant that the application is based on
