@@ -41,6 +41,6 @@ func DumpData(data interface{}) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(os.Stdout, string(b))
+	fmt.Fprintf(os.Stdout, "%s", string(b))
 	return nil
 }

@@ -51,7 +51,7 @@ func RFC3493Dialer(network, address string) (net.Conn, error) {
 		}
 		return c, err
 	}
-	return nil, fmt.Errorf("Unable to connect to: " + address)
+	return nil, fmt.Errorf("Unable to connect to: %s", address)
 }
 
 // InitTLSConfig returns a tls.Config populated with TLS1.3

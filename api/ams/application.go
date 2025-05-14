@@ -196,6 +196,11 @@ type ApplicationResources struct {
 	// Number of GPU slots required by the application
 	// Example: 2
 	GPUSlots int `json:"gpu-slots,omitempty" yaml:"gpu-slots,omitempty"`
+	// Type of the GPU to select for the instance. If not given the
+	// GPU with the minimum usage is assigned to the instance on the
+	// node it is scheduled on. Possible values are: amd, intel, nvidia
+	// Example: amd
+	GPUType string `json:"gpu-type,omitempty" yaml:"gpu-type,omitempty"`
 	// Number of VPU slots required by the application
 	// Example: 1
 	VPUSlots int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
@@ -217,6 +222,9 @@ func (a *ApplicationResourcesPost) ToApplicationResources() ApplicationResources
 	}
 	if a.GPUSlots != nil && *a.GPUSlots >= 0 {
 		resources.GPUSlots = *a.GPUSlots
+	}
+	if a.GPUType != nil && len(*a.GPUType) > 0 {
+		resources.GPUType = *a.GPUType
 	}
 	if a.VPUSlots != nil && *a.VPUSlots >= 0 {
 		resources.VPUSlots = *a.VPUSlots
@@ -240,6 +248,11 @@ type ApplicationResourcesPost struct {
 	// Number of GPU slots required by the application
 	// Example: 2
 	GPUSlots *int `json:"gpu-slots,omitempty" yaml:"gpu-slots,omitempty"`
+	// Type of the GPU to select for the instance. If not given the
+	// GPU with the minimum usage is assigned to the instance on the
+	// node it is scheduled on. Possible values are: amd, intel, nvidia
+	// Example: amd
+	GPUType *string `json:"gpu-type,omitempty" yaml:"gpu-type,omitempty"`
 	// Number of VPU slots required by the application
 	// Example: 1
 	VPUSlots *int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`

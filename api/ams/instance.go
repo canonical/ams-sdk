@@ -132,6 +132,11 @@ type InstanceResources struct {
 	// GPUSlots specifies the number of GPU slots the instance got allocated
 	// Example: 1
 	GPUSlots int `json:"gpu-slots,omitempty" yaml:"gpu-slots,omitempty"`
+	// Type of the GPU to select for the instance. If not given the
+	// GPU with the minimum usage is assigned to the instance on the
+	// node it is scheduled on. Possible values are: amd, intel, nvidia
+	// Example: amd
+	GPUType string `json:"gpu-type,omitempty" yaml:"gpu-type,omitempty"`
 	// VPUSlots specifies the number of VPU slots the instance
 	VPUSlots int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
 }
@@ -330,6 +335,11 @@ type InstancesPost struct {
 		// Number of GPU slots the instance should get assigned.
 		// Example: 1
 		GPUSlots *int `json:"gpu-slots,omitempty" yaml:"gpu-slots,omitempty"`
+		// Type of the GPU to select for the instance. If not given the
+		// GPU with the minimum usage is assigned to the instance on the
+		// node it is scheduled on. Possible values are: amd, intel, nvidia
+		// Example: amd
+		GPUType *string `json:"gpu-type,omitempty" yaml:"gpu-type,omitempty"`
 		// Number of VPU slots the instance should get assigned
 		// Example: 1
 		VPUSlots *int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
@@ -395,7 +405,7 @@ type InstancesDelete struct {
 // API extension: instance_exec
 type InstanceExecPost struct {
 	// Command inside the instance to execute
-	// Example: /bin/ls
+	// Example: ["/bin/ls"]
 	Command []string `json:"command" yaml:"command"`
 	// Environment to setup when the command is executed.
 	// Example: {"FOO": "bar"}

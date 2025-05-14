@@ -47,6 +47,14 @@ type Event struct {
 	Metadata interface{} `json:"metadata"`
 }
 
+// EventAuth defines the structure of the response sent as metadata for events authentication endpoint
+//
+// swagger:model
+type EventAuth struct {
+	// Token represents a signed JWT token issued by AMS.
+	Token string `json:"token"`
+}
+
 // LifecycleEventAction describes a single lifecycle action
 type LifecycleEventAction string
 
