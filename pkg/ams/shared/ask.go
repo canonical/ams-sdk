@@ -46,7 +46,7 @@ func AskForBool(question string, defaultAnswer string) bool {
 
 // AskForPassword asks the user to enter a password.
 func AskForPassword(question string) string {
-	fmt.Printf(question)
+	fmt.Print(question)
 	pwd, _ := terminal.ReadPassword(0)
 	fmt.Println("")
 
@@ -55,7 +55,7 @@ func AskForPassword(question string) string {
 
 // Ask a question on the output stream and read the answer from the input stream
 func askQuestion(question, defaultAnswer string) string {
-	fmt.Printf(question)
+	fmt.Print(question)
 
 	return readAnswer(defaultAnswer)
 }
@@ -74,5 +74,5 @@ func readAnswer(defaultAnswer string) string {
 
 // Print an invalid input message on the error stream
 func invalidInput() {
-	fmt.Fprintf(os.Stderr, "Invalid input, try again.\n\n")
+	fmt.Fprint(os.Stderr, "Invalid input, try again.\n\n")
 }

@@ -65,7 +65,7 @@ func showContainerLog(c client.Client, id, logName string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf(string(content))
+		fmt.Printf("%s", string(content))
 		return nil
 	})
 }

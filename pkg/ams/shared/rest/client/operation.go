@@ -119,7 +119,7 @@ func (op *operation) Wait(ctx context.Context) error {
 	// Check if not done already
 	if op.StatusCode.IsFinal() {
 		if op.Err != "" {
-			return fmt.Errorf(op.Err)
+			return fmt.Errorf("%s", op.Err)
 		}
 		return nil
 	}
@@ -148,7 +148,7 @@ func (op *operation) Wait(ctx context.Context) error {
 
 	// We're done, parse the result
 	if op.Err != "" {
-		return fmt.Errorf(op.Err)
+		return fmt.Errorf("%s", op.Err)
 	}
 	return nil
 }
@@ -263,7 +263,7 @@ func (op *operation) setupListener() error {
 		close(chReady)
 
 		if op.Err != "" {
-			return fmt.Errorf(op.Err)
+			return fmt.Errorf("%s", op.Err)
 		}
 
 		return nil

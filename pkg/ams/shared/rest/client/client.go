@@ -146,7 +146,7 @@ func extractErrorFromResponse(resp *http.Response) error {
 		return err
 	}
 
-	return fmt.Errorf(errorResponse.Message)
+	return fmt.Errorf("%s", errorResponse.Message)
 }
 
 // ServiceURL returns the URL of the service the client is connected to
