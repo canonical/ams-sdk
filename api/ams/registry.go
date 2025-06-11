@@ -39,6 +39,8 @@ type RegistryApplicationVersion struct {
 }
 
 // RegistryApplication describes a single application available in the registry
+//
+// swagger:model
 type RegistryApplication struct {
 	Name          string                              `json:"name" yaml:"name"`
 	Architectures []string                            `json:"architectures" yaml:"architectures"`
