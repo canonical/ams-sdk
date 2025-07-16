@@ -289,10 +289,10 @@ type NodeGPUPatch struct {
 	// ID of the GPU configured on the node
 	// Example: 0
 	ID uint64 `json:"id" yaml:"id"`
-	// Update the number of the GPU slots available on the Node
+	// Number of GPU slots available on the node.
 	// Example: 20
 	Slots *int `json:"slots" yaml:"slots"`
-	// Update the number of GPU encoder slots
+	// Number of GPU encoder slots.
 	// Example: 4
 	EncoderSlots *int `json:"encoder_slots" yaml:"encoder_slots"`
 }
@@ -308,12 +308,12 @@ type NodePatch struct {
 	// Number of CPUs dedicated to instances.
 	// Example: 4
 	CPUs *int `json:"cpus"`
-	// CPU allocation rate used for over-committing resources
+	// CPU allocation rate used for over-committing resources.
 	// Example: 4
 	// Extensions:
 	// x-docs-ref: sec-over-committing
 	CPUAllocationRate *float32 `json:"cpu_allocation_rate"`
-	// Update the memory (in GB) for the node
+	// Update the memory (in GB) for the node.
 	// Example: 2GB
 	Memory *string `json:"memory"`
 	// Memory allocation rate used for over-committing resources.
@@ -321,13 +321,14 @@ type NodePatch struct {
 	// Extensions:
 	// x-docs-ref: sec-over-committing
 	MemoryAllocationRate *float32 `json:"memory_allocation_rate"`
-	// Update the number of GPU slots to configure on the node
+	// Number of GPU slots to configure on the node.
 	// Example: 2
 	GPUSlots *int `json:"gpu_slots"`
 	// Number of GPU encoder slots available on the node.
-	// `0` for nodes without GPU
-	// `32` for nodes with NVIDIA GPU
-	// `10` for nodes with AMD or Intel GPU
+	// Default values: 0 for nodes without GPU;
+	// 32 for nodes with NVIDIA GPU;
+	// 5 for nodes with AMD;
+	// 10 for nodes with Intel GPU.
 	// Example: 4
 	// Extensions:
 	// x-docs-ref: sec-gpu-slots
@@ -339,12 +340,12 @@ type NodePatch struct {
 	// Example: true
 	Unschedulable *bool          `json:"unschedulable" yaml:"unschedulable"`
 	GPUs          []NodeGPUPatch `json:"gpus" yaml:"gpus"`
-	// The network subnet of the machine where the node runs.
+	// The network subnet of the machine hosting the node.
 	// Example: 10.0.0.1/24
 	// swagger:strfmt ipv4
 	Subnet *string `json:"subnet" yaml:"subnet"`
 
-	// DEPRECATED Flag in favour of `unschedulable` flag
+	// DEPRECATED Flag in favour of `unschedulable` flag.
 	// Example: false
 	// Extensions:
 	// x-deprecated-since: "1.20"
