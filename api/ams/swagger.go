@@ -21,191 +21,228 @@
 
 // AMS external REST API
 //
-// all AMS clients. Note that internal endpoints are not included in this
-// documentation.
+//	all AMS clients. Note that internal endpoints are not included in this
+//	documentation.
 //
-// The AMS API is available over both a local unix+http and a remote https API.
-// Authentication for local users relies on group membership and access to the
-// unix socket. For remote users, the default authentication method is TLS client
-// certificates.
+//	The AMS API is available over both a local unix+http and a remote https API.
+//	Authentication for local users relies on group membership and access to the
+//	unix socket. For remote users, the default authentication method is TLS client
+//	certificates.
 //
-// ## Authentication
+//	## Authentication
 //
-// Not all REST API endpoints require authentication, for example, the following API calls are allowed for everyone:
+//	Not all REST API endpoints require authentication, for example, the following API calls are allowed for everyone:
 //
-// * `GET /`
-// * `GET /1.0`
-// * `GET /1.0/version`
+//	| - `GET /`
+//	| - `GET /1.0`
+//	| - `GET /1.0/version`
 //
-// Some endpoints require an additional authentication token to ensure that the requester is authorised to access the resource, for example:
+//	## API Authentication
 //
-// * `GET /1.0/artifacts`
-// * `PATCH /1.0/instances/<name>`
+//	The API can be accessed in one of the following ways:
 //
-// ## API versioning
+//	|  * **Unix Domain Socket**:
+//	|  	When using this type of connection, the API endpoints are protected using Unix Peer Cred authentication i.e. only certain unix uids
+//	|  	are given access to the API endpoints. These user uids can be configured in the AMS Daemon configuration by setting `allowed_uids`.
+//	|
+//	|  * **Standard HTTPS Connection**:
+//	|  When using this type of connection, the API endpoints are protected depending on the service configuration. The APIs support two types
+//	|  of authentication mechanisms:
+//	| 	  - mTLS Authentication:
+//	| 		By default AMS uses certificate based authentication or mTLS (Mutual TLS) to protect its API endpoints. Only certificates added to AMS
+//	| 		Trust Store are allowed access to the APIs. The certificates can be added or removed using `/1.0/certificates` endpoints by using a
+//	| 		Unix Domain Socket connection. This client certificate can then be used to make requests to AMS.
+//	|
+//	| 		*NOTE*:
+//	| 	 	Some endpoints require an additional authentication token to ensure that the requester is authorised to access the resource, for example:
+//	|
+//	| 	 	* `GET /1.0/artifacts`
+//	| 	 	* `PATCH /1.0/instances/<name>`
+//	|
+//	| 	 - OIDC Based Authentication
+//	| 	   AMS supports token based authentication for all its endpoints. Enabling this feature requires configuring AMS with an OIDC (OpenID Connect 2.0)
+//	| 	   Compliant Identity Provider. This can be configured in AMS daemon by setting the configuration items `oidc.*` to appropriate values.
+//	| 	   This enables the AMS API server to enable token based authentication and authorization as issued by the identity provider.
 //
-// The details of a version of the API can be retrieved using `GET /<version>`. For example, `GET /1.0`.
+//	If an API version is bumped to a major version, it indicates that backward compatibility is affected.
 //
-// If an API version is bumped to a major version, it indicates that backward compatibility is affected.
+//	Feature additions done without breaking backward compatibility only result in additions to `api_extensions` which can be used by the client to check if a given feature is supported by the server.
 //
-// Feature additions done without breaking backward compatibility only result in additions to `api_extensions` which can be used by the client to check if a given feature is supported by the server.
+//	## API versioning
 //
-// ## Return values
+//	The details of a version of the API can be retrieved using `GET /<version>`. For example, `GET /1.0`.
 //
-// There are three standard return types:
+//	If an API version is bumped to a major version, it indicates that backward compatibility is affected.
 //
-// * Standard return value
-// * Background operation
-// * Error
+//	Feature additions done without breaking backward compatibility only result in additions to `api_extensions` which can be used by the client to check if a given feature is supported by the server.
 //
-// ### Standard return value
+//	## Return values
 //
-// For a standard synchronous operation, the following dict is returned:
+//	There are three standard return types:
 //
-// ```json
-// {
-// "type": "sync",
-// "status": "Success",
-// "status_code": 200,
-// "metadata": {}
-// }
-// ```
+//	| * Standard return value
+//	| * Background operation
+//	| * Error
 //
-// HTTP response status code is 200.
+//	### Standard return value
 //
-// ### Background operation
+//	For a standard synchronous operation, the following dict is returned:
 //
-// When a request results in a background operation, the HTTP code is set to 202 (Accepted) and the Location HTTP header is set to the operation URL.
+//	```json
+//	{
+//	"type": "sync",
+//	"status": "Success",
+//	"status_code": 200,
+//	"metadata": {}
+//	}
+//	```
 //
-// The response body is a dict with the following structure:
+//	HTTP response status code is 200.
 //
-// ```json
-// {
-// "type": "async",
-// "status": "OK",
-// "status_code": 100,
-// "operation": "/1.0/containers/<id>",
-// "metadata": {}
-// }
-// ```
+//	### Background operation
 //
-// The operation metadata structure looks like:
+//	When a request results in a background operation, the HTTP code is set to 202 (Accepted) and the Location HTTP header is set to the operation URL.
 //
-// ```json
-// {
-// "id": "c6832c58-0867-467e-b245-2962d6527876",
-// "class": "task",
-// "created_at": "2018-04-02T16:49:36.341463206+02:00",
-// "updated_at": "2018-04-02T16:49:36.341463206+02:00",
-// "status": "Running",
-// "status_code": 103,
-// "resources": {
-// "containers": [
-// "/1.0/containers/3apqo5te"
-// ]
-// },
-// "metadata": null,
-// "may_cancel": false,
-// "err": ""
-// }
-// ```
+//	The response body is a dict with the following structure:
 //
-// The body is mostly provided as a user friendly way of seeing what's going on without having to pull the target operation, all information in the body can also be retrieved from the background operation URL.
+//	```json
+//	{
+//	"type": "async",
+//	"status": "OK",
+//	"status_code": 100,
+//	"operation": "/1.0/containers/<id>",
+//	"metadata": {}
+//	}
+//	```
 //
-// ### Error
+//	The operation metadata structure looks like:
 //
-// There are various situations in which something may immediately go wrong, in those cases, the following return value is used:
+//	```json
+//	{
+//	"id": "c6832c58-0867-467e-b245-2962d6527876",
+//	"class": "task",
+//	"created_at": "2018-04-02T16:49:36.341463206+02:00",
+//	"updated_at": "2018-04-02T16:49:36.341463206+02:00",
+//	"status": "Running",
+//	"status_code": 103,
+//	"resources": {
+//	"containers": [
+//	"/1.0/containers/3apqo5te"
+//	]
+//	},
+//	"metadata": null,
+//	"may_cancel": false,
+//	"err": ""
+//	}
+//	```
 //
-// ```json
-// {
-// "type": "error",
-// "error": "Failure",
-// "error_code": 400,
-// "metadata": {}
-// }
-// ```
+//	The body is mostly provided as a user friendly way of seeing what's going on without having to pull the target operation, all information in the body can also be retrieved from the background operation URL.
 //
-// HTTP response status code is one of 400, 401, 403, 404, 409, 412 or 500.
+//	### Error
 //
-// ## Status codes
+//	There are various situations in which something may immediately go wrong, in those cases, the following return value is used:
 //
-// The REST API often has to return status information, which could be the reason for an error, the current state of an operation or the state of the various resources it exports.
+//	```json
+//	{
+//	"type": "error",
+//	"error": "Failure",
+//	"error_code": 400,
+//	"metadata": {}
+//	}
+//	```
 //
-// To make it simple to debug, there are two ways in which such information is represented - a numeric representation of the state which is guaranteed never to change and can be relied on by API clients and a text version so that it is easier for people manually using the API to understand better. In most cases, those will be called `status` and `status_code`, the former being the user friendly string representation and the latter being the fixed numeric value.
+//	HTTP response status code is one of 400, 401, 403, 404, 409, 412 or 500.
 //
-// The codes are always 3 digits, with the following ranges:
+//	## Status codes
 //
-// * 100 to 199: resource state (started, stopped, ready, ...)
-// * 200 to 399: positive action result
-// * 400 to 599: negative action result
-// * 600 to 999: future use
+//	The REST API often has to return status information, which could be the reason for an error, the current state of an operation or the state of the various resources it exports.
 //
-// ### List of current status codes
+//	To make it simple to debug, there are two ways in which such information is represented - a numeric representation of the state which is guaranteed never to change and can be relied on by API clients and a text version so that it is easier for people manually using the API to understand better. In most cases, those will be called `status` and `status_code`, the former being the user friendly string representation and the latter being the fixed numeric value.
 //
-// | Code  | Meaning |
-// |------|------ |
-// | 100   | Operation created |
-// | 101   | Started |
-// | 102   | Stopped |
-// | 103   | Running |
-// | 104   | Cancelling |
-// | 105   | Pending |
-// | 106   | Starting |
-// | 107   | Stopping |
-// | 108   | Aborting |
-// | 109   | Freezing |
-// | 110   | Frozen |
-// | 111   | Thawed |
-// | 200   | Success |
-// | 400   | Failure |
-// | 401   | Cancelled |
+//	The codes are always 3 digits, with the following ranges:
 //
-// ## Recursion
+//	* 100 to 199: resource state (started, stopped, ready, ...)
+//	* 200 to 399: positive action result
+//	* 400 to 599: negative action result
+//	* 600 to 999: future use
 //
-// To optimise queries of large lists, recursion is implemented for collections. A `recursion` argument can be passed to a GET query against a collection.
+//	### List of current status codes
 //
-// The default value is 0 which means that collection member URLs are returned. Setting it to 1 will have those URLs be replaced by the object they point to (typically a dict).
+//	| Code  | Meaning |
+//	|------|------ |
+//	| 100   | Operation created |
+//	| 101   | Started |
+//	| 102   | Stopped |
+//	| 103   | Running |
+//	| 104   | Cancelling |
+//	| 105   | Pending |
+//	| 106   | Starting |
+//	| 107   | Stopping |
+//	| 108   | Aborting |
+//	| 109   | Freezing |
+//	| 110   | Frozen |
+//	| 111   | Thawed |
+//	| 200   | Success |
+//	| 400   | Failure |
+//	| 401   | Cancelled |
 //
-// Recursion is implemented by simply replacing any pointer to a job (URL) by the object itself.
+//	## Recursion
 //
-// ## Async operations
+//	To optimise queries of large lists, recursion is implemented for collections. A `recursion` argument can be passed to a GET query against a collection.
 //
-// Any operation which take more than a second must be done in the background, returning a background operation ID to the client. With this ID, the client is able to either poll for a status update or wait for a notification using the long-poll API.
+//	The default value is 0 which means that collection member URLs are returned. Setting it to 1 will have those URLs be replaced by the object they point to (typically a dict).
 //
-// ## Notifications
+//	Recursion is implemented by simply replacing any pointer to a job (URL) by the object itself.
 //
-// A web-socket based API is available for notifications. Different notification types exist to limit the traffic going to the client. It is recommended that the client always subscribes to the *operations* notification type before triggering remote operations so that it doesn't have to continually poll for their status.
+//	## Async operations
 //
-// ## PUT vs PATCH
+//	Any operation which take more than a second must be done in the background, returning a background operation ID to the client. With this ID, the client is able to either poll for a status update or wait for a notification using the long-poll API.
 //
-// PUT and PATCH APIs are supported to modify existing objects.
+//	## Notifications
 //
-// PUT replaces the entire object with a new definition, it's typically called after the current object state was retrieved through GET.
+//	A web-socket based API is available for notifications. Different notification types exist to limit the traffic going to the client. It is recommended that the client always subscribes to the *operations* notification type before triggering remote operations so that it doesn't have to continually poll for their status.
 //
-// To avoid race conditions, the ETag header should be read from the GET response and sent as If-Match for the PUT request. Doing so makes the request fail if the object was modified between GET and PUT.
+//	## PUT vs PATCH
 //
-// PATCH can be used to modify a single field inside an object by only specifying the property that you want to change. To unset a key, setting it to empty will usually do the trick, but there are cases where PATCH won't work and PUT needs to be used instead.
+//	PUT and PATCH APIs are supported to modify existing objects.
 //
-// ## Authorisation
+//	PUT replaces the entire object with a new definition, it's typically called after the current object state was retrieved through GET.
 //
-// Some operation may require a token to be included in the HTTP Authorisation header even if the request is already authenticated using a trusted certificate. If the token is not valid, the request is rejected by the server. This ensures that only authorised clients can access those endpoints.
+//	To avoid race conditions, the ETag header should be read from the GET response and sent as If-Match for the PUT request. Doing so makes the request fail if the object was modified between GET and PUT.
 //
-// Authorization: bearer <token>
+//	PATCH can be used to modify a single field inside an object by only specifying the property that you want to change. To unset a key, setting it to empty will usually do the trick, but there are cases where PATCH won't work and PUT needs to be used instead.
 //
-// ## File upload
+//	## Authorisation
 //
-// Some operations require uploading a payload. To prevent the difficulties of handling multipart requests, a unique file is uploaded and its bytes are included in the body of the request. The following metadata associated with the file is included in extra HTTP headers:
+//	Some operation may require a token to be included in the HTTP Authorisation header even if the request is already authenticated using a trusted certificate. If the token is not valid, the request is rejected by the server. This ensures that only authorised clients can access those endpoints.
 //
-// * X-AMS-Fingerprint: Fingerprint of the payload being added
-// * X-AMS-Request: Metadata for the payload. This is a JSON, specific for the operation.
+//	Authorization: bearer <token>
 //
-// ## Instances and Containers
+//	## File upload
 //
-// The documentation shows paths such as `/1.0/instances/...`, which were introduced with Anbox Cloud version 1.20.0. Older releases that supported only containers and not virtual machines supply the exact same API at `/1.0/containers/...`.
+//	Some operations require uploading a payload. To prevent the difficulties of handling multipart requests, a unique file is uploaded and its bytes are included in the body of the request. The following metadata associated with the file is included in extra HTTP headers:
 //
-// Although deprecated, the `1.0/containers/...` API is still available for backward compatibility.
+//	* X-AMS-Fingerprint: Fingerprint of the payload being added
+//	* X-AMS-Request: Metadata for the payload. This is a JSON, specific for the operation.
 //
-// Version: 1.0
+//	## Instances and Containers
+//
+//	The documentation shows paths such as `/1.0/instances/...`, which were introduced with Anbox Cloud version 1.20.0. Older releases that supported only containers and not virtual machines supply the exact same API at `/1.0/containers/...`.
+//
+//	Although deprecated, the `1.0/containers/...` API is still available for backward compatibility.
+//
+//	Version: 1.0
+//
+//	securityDefinitions:
+//	 bearerAuth:
+//	  type: apiKey
+//	  name: Authorization
+//	  in: header
+//	  description: |
+//	    Provide the Bearer token in the format: "Bearer {token}".
+//
+//	security:
+//	  - bearerAuth: []
 //
 // swagger:meta
 package api

@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -44,13 +45,15 @@ func (c *client) composeWebsocketPath(path string) string {
 
 func (c *client) dialWebsocket(url string) (*websocket.Conn, error) {
 
-	switch c.Doer.(type) {
+	var t *http.Transport
+	switch c := c.Doer.(type) {
+	case *oidcClient:
+		t = c.Client.Transport.(*http.Transport)
 	case *http.Client:
+		t = c.Transport.(*http.Transport)
 	default:
 		return nil, errors.New("Client is not a valid http one")
 	}
-
-	t := c.Doer.(*http.Client).Transport.(*http.Transport)
 
 	// Setup a new websocket dialer based on it
 	dialer := websocket.Dialer{
@@ -61,6 +64,22 @@ func (c *client) dialWebsocket(url string) (*websocket.Conn, error) {
 
 	// Set the user agent
 	headers := http.Header{}
+	if cl, ok := c.Doer.(*oidcClient); ok {
+		expiry, err := cl.tokenProvider.GetAccessTokenExpiry()
+		if err != nil {
+			return nil, err
+		}
+		if expiry.Before(time.Now()) {
+			if err := cl.tokenProvider.RefreshToken(); err != nil {
+				return nil, err
+			}
+		}
+		token, err := cl.tokenProvider.GetAccessToken()
+		if err != nil {
+			return nil, err
+		}
+		headers.Set("Authorization", "Bearer "+token)
+	}
 	if c.httpUserAgent != "" {
 		headers.Set("User-Agent", c.httpUserAgent)
 	}

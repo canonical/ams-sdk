@@ -15,7 +15,7 @@
  * You should have received a copy of the Lesser GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-//
+
 // Taken from https://github.com/canonical/lxd/blob/master/shared/proxy.go under the
 // terms of Apache-2.0
 
