@@ -26,7 +26,6 @@ import (
 
 	api "github.com/anbox-cloud/ams-sdk/api/ams"
 	restapi "github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/api"
-	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/client"
 	restclient "github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/client"
 )
 
@@ -105,8 +104,8 @@ type Client interface {
 	ListImages() ([]api.Image, error)
 	AddImage(name, packagePath string, isDefault bool, sentBytes chan float64) (restclient.Operation, error)
 	UpdateImage(id, packagePath string, sentBytes chan float64) (restclient.Operation, error)
-	ImportImage(name, path string, isDefault bool) (client.Operation, error)
-	ImportImageByType(name, path string, imgType api.ImageType, isDefault bool) (client.Operation, error)
+	ImportImage(name, path string, isDefault bool) (restclient.Operation, error)
+	ImportImageByType(name, path string, imgType api.ImageType, isDefault bool) (restclient.Operation, error)
 	SetDefaultImage(id string) error
 	DeleteImageByIDOrName(id string, force bool, imgType api.ImageType) (restclient.Operation, error)
 	DeleteImageVersion(id string, version int) (restclient.Operation, error)
@@ -122,9 +121,9 @@ type Client interface {
 
 	// Registry
 	ListApplicationsFromRegistry() ([]api.RegistryApplication, error)
-	PushApplicationToRegistry(id string) (client.Operation, error)
-	PullApplicationFromRegistry(id string) (client.Operation, error)
-	DeleteApplicationFromRegistry(id string) (client.Operation, error)
+	PushApplicationToRegistry(id string) (restclient.Operation, error)
+	PullApplicationFromRegistry(id string) (restclient.Operation, error)
+	DeleteApplicationFromRegistry(id string) (restclient.Operation, error)
 
 	GetEvents() (*restclient.EventListener, error)
 
@@ -132,6 +131,13 @@ type Client interface {
 	ListOperations() (map[string][]*restapi.Operation, error)
 	ShowOperation(id string) (*restapi.Operation, error)
 	CancelOperation(id string) error
+
+	// Auth
+	GetOIDCConfig(grantType string) (*restapi.OIDCResponse, string, error)
+	CreateOIDCIdentity(details *api.OIDCIdentityPost) (restclient.Operation, error)
+	ListIdentitiesWithFilters(filters []string) ([]api.Identity, error)
+	RetrieveIdentityByID(id string) (*api.Identity, string, error)
+	DeleteIdentity(id string) (restclient.Operation, error)
 }
 
 // clientImpl encapsulates a client to the AMS service and allows performing
@@ -144,8 +150,8 @@ type clientImpl struct {
 
 // New creates a new client talking to the AMS service at the specified URL or unix.socket path
 // and with the specified tls config, if provided
-func New(addr interface{}, tlsConfig *tls.Config) (Client, error) {
-	c, err := restclient.New(addr, tlsConfig)
+func New(addr any, tlsConfig *tls.Config) (Client, error) {
+	c, err := restclient.NewTLSClient(addr, tlsConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -156,5 +162,20 @@ func New(addr interface{}, tlsConfig *tls.Config) (Client, error) {
 		return nil, err
 	}
 
+	return &client, nil
+}
+
+// NewOIDCClient creates a new client OIDC talking to the AMS service at the specified URL
+// and with the specified OIDC token
+func NewOIDCClient(addr any, tlsConfig *tls.Config, tokenProvider restclient.TokenProvider) (Client, error) {
+	c, err := restclient.NewOIDCClient(addr, tlsConfig, tokenProvider)
+	if err != nil {
+		return nil, err
+	}
+	client := clientImpl{Client: c}
+	client.hasInstanceSupport, err = client.HasExtension("instance_support")
+	if err != nil {
+		return nil, err
+	}
 	return &client, nil
 }

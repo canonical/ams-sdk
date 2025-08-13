@@ -60,9 +60,9 @@ type client struct {
 // QueryParams request query parameter
 type QueryParams map[string]string
 
-// New returns a REST client. Depending on provided addr parameter, it connects to
-// a remote network server or through a unix socket
-func New(addr interface{}, tlsConfig *tls.Config) (Client, error) {
+// NewTLSClient returns a REST client. Depending on provided addr parameter, it
+// connects to a remote network server or through a unix socket
+func NewTLSClient(addr any, tlsConfig *tls.Config) (Client, error) {
 	if addr == nil {
 		return nil, errors.New("Empty address given")
 	}
@@ -90,17 +90,44 @@ func newNetworkClient(url *url.URL, tlsConfig *tls.Config) (Client, error) {
 	}
 
 	c := &client{
+		serviceURL:         url,
+		eventListenersLock: &sync.Mutex{},
 		Doer: &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: tlsConfig,
 			},
 			Timeout: DefaultTransportTimeout,
 		},
+	}
+	return c, nil
+}
+
+// NewOIDCClient constructs a new oidcClient, ensuring the token field is non-nil to prevent panics during authentication.
+func NewOIDCClient(addr any, tlsConfig *tls.Config, tokenProvier TokenProvider) (Client, error) {
+	if addr == nil {
+		return nil, errors.New("empty address given")
+	}
+	url, ok := addr.(*url.URL)
+	if !ok {
+		return nil, fmt.Errorf("invalid URL given")
+	}
+	if tlsConfig == nil {
+		tlsConfig = &tls.Config{InsecureSkipVerify: false}
+	}
+	client := client{
+		Doer: &oidcClient{
+			Client: &http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: tlsConfig,
+				},
+				Timeout: DefaultTransportTimeout,
+			},
+			tokenProvider: tokenProvier,
+		},
 		serviceURL:         url,
 		eventListenersLock: &sync.Mutex{},
 	}
-
-	return c, nil
+	return &client, nil
 }
 
 // newUnixSocketClient returns a REST client pointing to local unix socket
