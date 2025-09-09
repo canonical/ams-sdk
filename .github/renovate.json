@@ -19,6 +19,12 @@
         "minor",
         "major"
       ]
+    },
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "enabled": false
     }
   ]
 }
