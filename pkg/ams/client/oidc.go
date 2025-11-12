@@ -19,11 +19,6 @@
 package client
 
 import (
-	"bytes"
-	"encoding/json"
-	"net/http"
-
-	api "github.com/anbox-cloud/ams-sdk/api/ams"
 	errs "github.com/anbox-cloud/ams-sdk/pkg/ams/shared/errors"
 	restapi "github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/api"
 	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/client"
@@ -45,22 +40,4 @@ func (c *clientImpl) GetOIDCConfig(grantType string) (*restapi.OIDCResponse, str
 	}
 	etag, err := c.QueryStruct("GET", client.APIPath("auth/oidc"), params, nil, nil, "", config)
 	return config, etag, err
-}
-
-// CreateOIDCIdentity creates a new OIDC based identity in AMS
-func (c *clientImpl) CreateOIDCIdentity(details *api.OIDCIdentityPost) (client.Operation, error) {
-	hasOIDCSupport, err := c.HasExtension("oidc_support")
-	if err != nil {
-		return nil, err
-	}
-	if !hasOIDCSupport {
-		return nil, errs.NewErrNotSupported("OIDC Authentication")
-	}
-	b, err := json.Marshal(details)
-	if err != nil {
-		return nil, err
-	}
-	header := http.Header{"Content-Type": []string{"application/json"}}
-	op, _, err := c.QueryOperation("POST", client.APIPath("auth/identities"), nil, header, bytes.NewReader(b), "")
-	return op, err
 }

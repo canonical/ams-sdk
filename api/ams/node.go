@@ -192,6 +192,9 @@ type Node struct {
 	// Flag used to see if the node is available to schedule containers
 	// Example: false
 	Unschedulable bool `json:"unschedulable" yaml:"unschedulable"`
+	// Instance Types supported by the LXD node.
+	// Example: ["container", "vm"]
+	InstanceTypes []InstanceType `json:"instance_types,omitempty" yaml:"instance_types,omitempty"`
 	// CPU architecture of the node
 	// Example: aarch64
 	Architecture string `json:"architecture,omitempty" yaml:"architecture,omitempty"`

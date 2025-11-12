@@ -15,32 +15,19 @@
  * You should have received a copy of the Lesser GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package api
 
-package errors
+// Permission represents a structure defining a permission within AMS.
+//
+// swagger:model
+type Permission struct {
+	// Entitlement represents the type of action allowed on a resource
+	// Example: can_edit
+	Entitlement string `json:"entitlement" yaml:"entitlement"`
 
-import "fmt"
-
-// ErrNotChanged describes an error when a value has changed
-type ErrNotChanged struct {
-	content
-}
-
-// Error returns the error string
-func (e ErrNotChanged) Error() string {
-	return fmt.Sprintf("%s not changed", e.What)
-}
-
-// NewErrNotChanged returns a new ErrNotChanged struct
-func NewErrNotChanged(what string) ErrNotChanged {
-	return ErrNotChanged{content{what}}
-}
-
-// IsErrNotChanged checks if the given error is of type ErrNotChanged
-func IsErrNotChanged(err error) bool {
-	switch err.(type) {
-	case ErrNotChanged:
-		return true
-	default:
-		return false
-	}
+	// Resource represents the object on which a permission is being assigned.
+	// The resource can be for the format `<resource_type>:<resource_id>` or `server`
+	// `server` is a special resource used to assign permissions globally for the server.
+	// Example: instance:foo
+	Resource string `json:"resource" yaml:"resource"`
 }

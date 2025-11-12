@@ -258,6 +258,9 @@ type Instance struct {
 			// Density is the piel density of the virtual display
 			Density int `json:"density" yaml:"density"`
 		} `json:"display,omitempty" yaml:"display,omitempty"`
+		Security struct {
+			DeleteProtected bool `json:"delete_protected" yaml:"delete_protected"`
+		} `json:"security" yaml:"security"`
 	} `json:"config,omitempty"`
 	// Resources specifies the resources allocated for the instance
 	Resources InstanceResources `json:"resources,omitempty"`
@@ -380,6 +383,11 @@ type InstancesPost struct {
 			// Density is the piel density of the virtual display
 			Density int `json:"density" yaml:"density"`
 		} `json:"display,omitempty" yaml:"display,omitempty"`
+		// Security settings for the instance
+		Security struct {
+			// Delete protection for the instance
+			DeleteProtected *bool `json:"delete_protected,omitempty" yaml:"delete_protected,omitempty"`
+		} `json:"security,omitempty" yaml:"security,omitempty"`
 	} `json:"config,omitempty" yaml:"config,omitempty"`
 	// Do not start the instance after creation.
 	NoStart bool `json:"no_start,omitempty" yaml:"no_start,omitempty"`
@@ -448,6 +456,15 @@ type InstanceDelete struct {
 type InstancePatch struct {
 	// Desired status of the instance
 	DesiredStatus *string `json:"desired_status"`
+
+	// Configuration of the instance
+	Config struct {
+		// Security settings for the instance
+		Security struct {
+			// Delete protection for the instance
+			DeleteProtected *bool `json:"delete_protected,omitempty" yaml:"delete_protected,omitempty"`
+		} `json:"security,omitempty" yaml:"security,omitempty"`
+	} `json:"config,omitempty"`
 }
 
 // MapInstanceToContainer converts an instance API object to a container one

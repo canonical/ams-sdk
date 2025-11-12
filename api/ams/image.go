@@ -40,6 +40,8 @@ const (
 	ImageStatusDeleted ImageStatus = 4
 	// ImageStatusAvailable represents the state when an image is present on the remote but not in the LXD cluster
 	ImageStatusAvailable ImageStatus = 5
+	// ImageStatusQueued represents the state when an image is queued for a download.
+	ImageStatusQueued ImageStatus = 6
 )
 
 func (s ImageStatus) String() string {
@@ -54,6 +56,8 @@ func (s ImageStatus) String() string {
 		return "active"
 	case ImageStatusInitializing:
 		return "initializing"
+	case ImageStatusQueued:
+		return "queued"
 	case ImageStatusDeleted:
 		return "deleted"
 	}

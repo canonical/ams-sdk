@@ -16,31 +16,19 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package errors
+package api
 
-import "fmt"
-
-// ErrNotChanged describes an error when a value has changed
-type ErrNotChanged struct {
-	content
+// Response is a standard response for AMS API operations
+type Response struct {
+	Status     string `json:"status"`
+	StatusCode int    `json:"status_code"`
+	Error      string `json:"error,omitempty"`
 }
 
-// Error returns the error string
-func (e ErrNotChanged) Error() string {
-	return fmt.Sprintf("%s not changed", e.What)
-}
-
-// NewErrNotChanged returns a new ErrNotChanged struct
-func NewErrNotChanged(what string) ErrNotChanged {
-	return ErrNotChanged{content{what}}
-}
-
-// IsErrNotChanged checks if the given error is of type ErrNotChanged
-func IsErrNotChanged(err error) bool {
-	switch err.(type) {
-	case ErrNotChanged:
-		return true
-	default:
-		return false
+// SuccessResponse returns a default success response
+func SuccessResponse() Response {
+	return Response{
+		Status:     "success",
+		StatusCode: 200,
 	}
 }
