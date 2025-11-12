@@ -71,6 +71,11 @@ type Client interface {
 	RetrieveInstanceLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error
 	ExecuteInstance(id string, details *api.InstanceExecPost, args *InstanceExecArgs) (restclient.Operation, error)
 
+	// Shares
+	CreateInstanceShare(id string, details *api.InstanceSharesPost) (*api.InstanceSharesPostResponse, error)
+	UpdateInstanceShareByID(instanceID, shareID string, details *api.InstanceSharePatch) error
+	DeleteInstanceShareByID(instanceID, shareID string) (restclient.Operation, error)
+
 	// Config
 	SetConfigItem(name, value string) error
 	RetrieveConfigItems() (map[string]interface{}, error)
@@ -134,10 +139,18 @@ type Client interface {
 
 	// Auth
 	GetOIDCConfig(grantType string) (*restapi.OIDCResponse, string, error)
-	CreateOIDCIdentity(details *api.OIDCIdentityPost) (restclient.Operation, error)
+	CreateIdentity(details *api.IdentityPost) (restclient.Operation, error)
 	ListIdentitiesWithFilters(filters []string) ([]api.Identity, error)
 	RetrieveIdentityByID(id string) (*api.Identity, string, error)
-	DeleteIdentity(id string) (restclient.Operation, error)
+	DeleteIdentity(id string, force bool) (restclient.Operation, error)
+	SetGroupsForIdentity(id string, groups []string) (restclient.Operation, error)
+
+	CreateAuthGroup(details *api.AuthGroupPost) (restclient.Operation, error)
+	RetrieveAuthGroup(name string) (*api.AuthGroup, string, error)
+	ListAuthGroupsWithFilters(filters []string) ([]api.AuthGroup, error)
+	DeleteAuthGroup(name string, force bool) (restclient.Operation, error)
+	UpdateAuthGroupDescription(name, description string) (restclient.Operation, error)
+	SetPermissionsForGroup(name string, permissions []api.Permission) (restclient.Operation, error)
 }
 
 // clientImpl encapsulates a client to the AMS service and allows performing

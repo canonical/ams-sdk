@@ -18,6 +18,10 @@
 package client
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+
 	api "github.com/anbox-cloud/ams-sdk/api/ams"
 	errs "github.com/anbox-cloud/ams-sdk/pkg/ams/shared/errors"
 	"github.com/anbox-cloud/ams-sdk/pkg/ams/shared/rest/client"
@@ -66,7 +70,7 @@ func (c *clientImpl) RetrieveIdentityByID(id string) (*api.Identity, string, err
 }
 
 // DeleteIdentity deletes an existing identity
-func (c *clientImpl) DeleteIdentity(id string) (client.Operation, error) {
+func (c *clientImpl) DeleteIdentity(id string, force bool) (client.Operation, error) {
 	if len(id) == 0 {
 		return nil, errs.NewInvalidArgument("id")
 	}
@@ -77,6 +81,50 @@ func (c *clientImpl) DeleteIdentity(id string) (client.Operation, error) {
 	if !hasOIDCSupport {
 		return nil, errs.NewErrNotSupported("OIDC Authentication")
 	}
-	op, _, err := c.QueryOperation("DELETE", client.APIPath(identitiesBasePath, id), nil, nil, nil, "")
+	details := api.IdentityDelete{Force: force}
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+	op, _, err := c.QueryOperation("DELETE", client.APIPath(identitiesBasePath, id), nil, nil, bytes.NewReader(b), "")
+	return op, err
+}
+
+// SetGroupsForIdentity is used to set membership groups for an identity
+func (c *clientImpl) SetGroupsForIdentity(id string, groups []string) (client.Operation, error) {
+	if len(id) == 0 {
+		return nil, errs.NewInvalidArgument("id")
+	}
+	hasGroupSupport, err := c.HasExtension("auth.groups")
+	if err != nil {
+		return nil, err
+	}
+	if !hasGroupSupport {
+		return nil, errs.NewErrNotSupported("Groups")
+	}
+	details := api.IdentityPut{Groups: groups}
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+	op, _, err := c.QueryOperation("PUT", client.APIPath(identitiesBasePath, id), nil, nil, bytes.NewReader(b), "")
+	return op, err
+}
+
+// CreateIdentity creates a new identity in AMS
+func (c *clientImpl) CreateIdentity(details *api.IdentityPost) (client.Operation, error) {
+	hasOIDCSupport, err := c.HasExtension("oidc_support")
+	if err != nil {
+		return nil, err
+	}
+	if !hasOIDCSupport {
+		return nil, errs.NewErrNotSupported("OIDC Authentication")
+	}
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+	header := http.Header{"Content-Type": []string{"application/json"}}
+	op, _, err := c.QueryOperation("POST", client.APIPath("auth/identities"), nil, header, bytes.NewReader(b), "")
 	return op, err
 }

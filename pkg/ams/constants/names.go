@@ -21,4 +21,8 @@ package constants
 const (
 	// DefaultNetworkName is the default LXD network name AMS creates
 	DefaultNetworkName = "amsbr0"
+	// AdminGroupName is the name of the default admin group
+	AdminGroupName = "admin"
+	// AdminGroupDescription is the description of the default admin group
+	AdminGroupDescription = "Administrators"
 )

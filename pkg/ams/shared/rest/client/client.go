@@ -183,7 +183,14 @@ func (c *client) ServiceURL() string {
 
 // HTTPTransport returns the HTTP transport the client uses internally
 func (c *client) HTTPTransport() *http.Transport {
-	return c.Doer.(*http.Client).Transport.(*http.Transport)
+	switch c.Doer.(type) {
+	case *oidcClient:
+		return c.Doer.(*oidcClient).Client.Transport.(*http.Transport)
+	case *http.Client:
+		return c.Doer.(*http.Client).Transport.(*http.Transport)
+	}
+
+	return nil
 }
 
 // SetTimeout overwrites default timeout of the client with a new one
