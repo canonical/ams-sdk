@@ -23,7 +23,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -72,7 +71,7 @@ func exportApplicationVersion(c client.Client, id, version, target string) error
 		log.Fatal(err)
 	}
 
-	file, err := ioutil.TempFile("", "ams_application_export")
+	file, err := os.CreateTemp("", "ams_application_export")
 	if err != nil {
 		return err
 	}

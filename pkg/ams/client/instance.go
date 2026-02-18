@@ -409,3 +409,32 @@ func (c *clientImpl) ExecuteInstance(id string, details *api.InstanceExecPost, a
 
 	return op, nil
 }
+
+// PublishInstance publishes an instance as an image
+func (c *clientImpl) PublishInstance(instanceID string, name string, force bool, makeDefault bool) (client.Operation, error) {
+	if !c.hasInstancePublishSupport {
+		return nil, errs.NewErrNotSupported("instance publish")
+	}
+
+	details := &api.ImagesPost{
+		Name:    name,
+		Default: makeDefault,
+		Source: &api.ImagesPostSource{
+			Type:     "instance",
+			Instance: instanceID,
+			Force:    force,
+		},
+	}
+
+	b, err := json.Marshal(details)
+	if err != nil {
+		return nil, err
+	}
+
+	header := http.Header{"Content-Type": []string{"application/json"}}
+	op, _, err := c.QueryOperation("POST", client.APIPath("images"), nil, header, bytes.NewReader(b), "")
+	if err != nil {
+		return nil, err
+	}
+	return op, nil
+}

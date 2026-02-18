@@ -63,6 +63,10 @@ type AuthGroup struct {
 	// Immutable defines whether a group is immutable and cannot be deleted or renamed
 	// Example: false
 	Immutable bool `json:"immutable" yaml:"immutable"`
+
+	// Entitlements lists the current identity's entitlements on this group
+	// Example: ["can_view", "can_edit"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
 }
 
 // AuthGroupPut replaces the editable fields for an auth group with the required values.

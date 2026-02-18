@@ -308,11 +308,9 @@ func (c *client) performRequest(method, path string, params QueryParams, header 
 		r.Header.Set("User-Agent", c.httpUserAgent)
 	}
 
-	if header != nil {
-		for k, v := range header {
-			for _, s := range v {
-				r.Header.Add(k, s)
-			}
+	for k, v := range header {
+		for _, s := range v {
+			r.Header.Add(k, s)
 		}
 	}
 

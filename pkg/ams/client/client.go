@@ -70,6 +70,7 @@ type Client interface {
 	DeleteInstances(ids []string, force bool) (restclient.Operation, error)
 	RetrieveInstanceLog(id, name string, downloader func(header *http.Header, body io.ReadCloser) error) error
 	ExecuteInstance(id string, details *api.InstanceExecPost, args *InstanceExecArgs) (restclient.Operation, error)
+	PublishInstance(instanceID string, name string, force bool, makeDefault bool) (restclient.Operation, error)
 
 	// Shares
 	CreateInstanceShare(id string, details *api.InstanceSharesPost) (*api.InstanceSharesPostResponse, error)
@@ -151,14 +152,17 @@ type Client interface {
 	DeleteAuthGroup(name string, force bool) (restclient.Operation, error)
 	UpdateAuthGroupDescription(name, description string) (restclient.Operation, error)
 	SetPermissionsForGroup(name string, permissions []api.Permission) (restclient.Operation, error)
+
+	GetPermissionsForCurrentIdentity() ([]api.Permission, error)
 }
 
 // clientImpl encapsulates a client to the AMS service and allows performing
 // various operations with the service
 type clientImpl struct {
 	restclient.Client
-	serviceStatus      *api.ServiceStatus
-	hasInstanceSupport bool
+	serviceStatus             *api.ServiceStatus
+	hasInstanceSupport        bool
+	hasInstancePublishSupport bool
 }
 
 // New creates a new client talking to the AMS service at the specified URL or unix.socket path
@@ -171,6 +175,11 @@ func New(addr any, tlsConfig *tls.Config) (Client, error) {
 
 	client := clientImpl{Client: c}
 	client.hasInstanceSupport, err = client.HasExtension("instance_support")
+	if err != nil {
+		return nil, err
+	}
+
+	client.hasInstancePublishSupport, err = client.HasExtension("instance_publish")
 	if err != nil {
 		return nil, err
 	}

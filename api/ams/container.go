@@ -213,6 +213,9 @@ type Container struct {
 	// Tags specifies the tags the container has assigned
 	// Example: ["foo", "bar"]
 	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty"`
+	// Entitlements lists the current identity's entitlements on this container
+	// Example: ["can_view", "can_edit"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
 }
 
 // GetContainerFilters returns an array of attributes available on the api to

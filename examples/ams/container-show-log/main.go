@@ -22,7 +22,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -61,7 +60,7 @@ func main() {
 
 func showContainerLog(c client.Client, id, logName string) error {
 	return c.RetrieveContainerLog(id, logName, func(header *http.Header, body io.ReadCloser) error {
-		content, err := ioutil.ReadAll(body)
+		content, err := io.ReadAll(body)
 		if err != nil {
 			return err
 		}

@@ -204,6 +204,8 @@ type ApplicationResources struct {
 	// Number of VPU slots required by the application
 	// Example: 1
 	VPUSlots int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
+	// NoDiskReserve defines whether to skip reserving the full disk quota upfront
+	NoDiskReserve bool `json:"no_disk_reserve,omitempty" yaml:"no_disk_reserve,omitempty"`
 }
 
 // ToApplicationResources returns a valid application resource from an application resource patch
@@ -228,6 +230,9 @@ func (a *ApplicationResourcesPost) ToApplicationResources() ApplicationResources
 	}
 	if a.VPUSlots != nil && *a.VPUSlots >= 0 {
 		resources.VPUSlots = *a.VPUSlots
+	}
+	if a.NoDiskReserve != nil {
+		resources.NoDiskReserve = *a.NoDiskReserve
 	}
 	return resources
 }
@@ -256,6 +261,8 @@ type ApplicationResourcesPost struct {
 	// Number of VPU slots required by the application
 	// Example: 1
 	VPUSlots *int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
+	// NoDiskReserve defines whether to skip reserving the full disk quota upfront
+	NoDiskReserve *bool `json:"no_disk_reserve,omitempty" yaml:"no_disk_reserve,omitempty"`
 }
 
 // ApplicationWatchdog describes the fields used to update an application watchdog
@@ -361,6 +368,9 @@ type Application struct {
 	// Parent image variant that the application is based on
 	// Example: android
 	ParentImageVariant string `json:"parent_image_variant" yaml:"parent_image_variant"`
+	// Entitlements available to the user for this application
+	// Example: ["can_view", "can_edit", "can_delete"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
 }
 
 // GetApplicationFilters returns an array of attributes available on the api to
