@@ -68,6 +68,9 @@ type Identity struct {
 	// Base64 encoded certificate content without the header or the footer (for TLS based identities)
 	// Example: MIIFUTCCAzmgAw...xjKoUEEQOzJ9
 	Certificate string `json:"certificate,omitempty" yaml:"certificate,omitempty"`
+	// Current identity's entitlements on the object
+	// Example: ["can_edit", "can_view"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
 }
 
 // IdentityPut contains the editable fields of an Identity.

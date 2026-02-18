@@ -80,6 +80,9 @@ type Addon struct {
 	// List of applications using this addon
 	// Example: ["app1", "app2"]
 	UsedBy []string `json:"used_by" yaml:"used_by"`
+	// List of entitlements the user has for this addon
+	// Example: ["can_view", "can_delete"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
 }
 
 // AddonsPost is used to create a new addon

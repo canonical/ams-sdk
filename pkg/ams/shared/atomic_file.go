@@ -20,7 +20,6 @@ package shared
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 )
@@ -55,7 +54,7 @@ func WriteFileAtomic(targetPath string, content []byte, mode os.FileMode) error 
 
 // NewAtomicFile creates a new AtomicFile with the given target path and mode
 func NewAtomicFile(targetPath string, mode os.FileMode) (*AtomicFile, error) {
-	f, err := ioutil.TempFile(path.Dir(targetPath), path.Base(targetPath))
+	f, err := os.CreateTemp(path.Dir(targetPath), path.Base(targetPath))
 	if err != nil {
 		return nil, err
 	}

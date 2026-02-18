@@ -144,6 +144,24 @@ type Image struct {
 	Type ImageType `json:"type" yaml:"type"`
 	// Variant of the image. Possible values are: android, aaos, generic, unknown
 	Variant string `json:"variant" yaml:"variant"`
+	// List of entitlements the user has for this image
+	// Example: ["can_view","can_edit"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
+}
+
+// ImagesPostSource specifies the source for creating an image
+//
+// swagger:model
+type ImagesPostSource struct {
+	// Type of source: "instance", "import", "upload"
+	// Example: instance
+	Type string `json:"type" yaml:"type"`
+	// Instance specifies the instance to create an image from (when Type="instance")
+	// Example: btavtegj1qm58qg7ru50
+	Instance string `json:"instance,omitempty" yaml:"instance,omitempty"`
+	// Force specifies whether to stop a running instance before publishing
+	// Example: false
+	Force bool `json:"force,omitempty" yaml:"force,omitempty"`
 }
 
 // ImagesPost represents the fields to upload a new image
@@ -164,6 +182,8 @@ type ImagesPost struct {
 	// is meant to be imported from a remote image server. If not specified
 	// all available image types will be imported.
 	Type ImageType `json:"type" yaml:"type"`
+	// Source specifies where to create the image from
+	Source *ImagesPostSource `json:"source,omitempty" yaml:"source,omitempty"`
 }
 
 // ImagePatch represents the fields to update an existing image

@@ -116,6 +116,17 @@ const (
 	InstanceTypeVM InstanceType = "vm"
 )
 
+// SourceType describes the source type of an instance
+type SourceType string
+
+const (
+	// SourceTypeAny represents that the source type of the instance does not matter
+	SourceTypeAny SourceType = ""
+
+	// SourceTypeInstance represents an existing instance for the source.
+	SourceTypeInstance SourceType = "instance"
+)
+
 // InstanceResources represents resources assigned to an instance
 //
 // swagger:model
@@ -139,13 +150,19 @@ type InstanceResources struct {
 	GPUType string `json:"gpu-type,omitempty" yaml:"gpu-type,omitempty"`
 	// VPUSlots specifies the number of VPU slots the instance
 	VPUSlots int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
+	// NoDiskReserve defines whether to skip reserving the full disk quota upfront
+	NoDiskReserve bool `json:"no_disk_reserve,omitempty" yaml:"no_disk_reserve,omitempty"`
 }
 
 // ToApplicationResources converts instance resources to application resources
 func (res *InstanceResources) ToApplicationResources() ApplicationResources {
 	// NOTE: GPUSlots or VPUSlots = 0 is a valid resource option, which means no gpu
 	// or vpu slot will be plugged for the container launching from the application
-	resources := ApplicationResources{GPUSlots: -1, VPUSlots: -1}
+	resources := ApplicationResources{
+		GPUSlots:      -1,
+		VPUSlots:      -1,
+		NoDiskReserve: res.NoDiskReserve,
+	}
 	if res.CPUs > 0 {
 		resources.CPUs = res.CPUs
 	}
@@ -270,6 +287,9 @@ type Instance struct {
 	// Tags specifies the tags the instance has assigned
 	// Example: ["foo", "bar"]
 	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty"`
+	// Entitlements lists the current identity's entitlements on this instance
+	// Example: ["can_view", "can_edit"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
 }
 
 // GetInstanceFilters returns an array of attributes available on the api to
@@ -346,6 +366,9 @@ type InstancesPost struct {
 		// Number of VPU slots the instance should get assigned
 		// Example: 1
 		VPUSlots *int `json:"vpu-slots,omitempty" yaml:"vpu-slots,omitempty"`
+		// If set to true, prevents the AMS from reserving the full disk quota upfront.
+		// Example: false
+		NoDiskReserve *bool `json:"no_disk_reserve,omitempty" yaml:"no_disk_reserve,omitempty"`
 	} `json:"resources" yaml:"resources"`
 	// Tags which will be assigned to the instance
 	// Example: ["tag0", "tag1"]
@@ -391,6 +414,20 @@ type InstancesPost struct {
 	} `json:"config,omitempty" yaml:"config,omitempty"`
 	// Do not start the instance after creation.
 	NoStart bool `json:"no_start,omitempty" yaml:"no_start,omitempty"`
+
+	Source InstanceSource `json:"source,omitempty" yaml:"source,omitempty"`
+}
+
+// InstanceSource represents the source for creating a new instance.
+//
+// swagger:model
+type InstanceSource struct {
+	// Type of the source resource used for creation. Possible values are: instance
+	// Example: instance
+	Type SourceType `json:"type" yaml:"type"`
+	// ID of the source resource.
+	// Example: cilsreunfpfec9b1ktg0
+	ID string `json:"id" yaml:"id"`
 }
 
 // InstancesDelete represents a list of instances to delete together
@@ -512,6 +549,7 @@ func MapInstanceToContainer(inst *Instance) Container {
 	c.Resources.DiskSize = shared.GetByteSizeString(inst.Resources.DiskSize, 0)
 	c.Resources.GPUSlots = inst.Resources.GPUSlots
 	c.Resources.VPUSlots = inst.Resources.VPUSlots
+	c.Entitlements = inst.Entitlements
 	if inst.IsBase {
 		c.Type = ContainerTypeBase
 	}

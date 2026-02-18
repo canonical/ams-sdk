@@ -28,7 +28,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"os/exec"
@@ -136,12 +135,16 @@ func FileMove(oldPath string, newPath string) error {
 // ListFilesInDir lists all files in one specific directory recursively
 func ListFilesInDir(dirPath string, recursive bool) ([]string, error) {
 	filelist := []string{}
-	files, err := ioutil.ReadDir(dirPath)
+	entries, err := os.ReadDir(dirPath)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, f := range files {
+	for _, entry := range entries {
+		f, err := entry.Info()
+		if err != nil {
+			return nil, err
+		}
 		if f.IsDir() {
 			if recursive {
 				list, err := ListFilesInDir(filepath.Join(dirPath, f.Name()), true)
@@ -178,12 +181,16 @@ func DirCopy(source string, dest string) error {
 		return err
 	}
 
-	files, err := ioutil.ReadDir(src)
+	entries, err := os.ReadDir(src)
 	if err != nil {
 		return err
 	}
 
-	for _, file := range files {
+	for _, entry := range entries {
+		file, err := entry.Info()
+		if err != nil {
+			return err
+		}
 		srcPath := filepath.Join(src, file.Name())
 		dstPath := filepath.Join(dst, file.Name())
 
@@ -310,7 +317,7 @@ func GetByteSizeString(input int64, precision uint) string {
 
 // LoadFromFile loads a configuration from the given file path
 func LoadFromFile(configPath string, cfg interface{}) error {
-	bytes, err := ioutil.ReadFile(configPath)
+	bytes, err := os.ReadFile(configPath)
 	if err != nil {
 		return err
 	}

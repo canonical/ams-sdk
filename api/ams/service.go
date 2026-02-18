@@ -34,6 +34,9 @@ type ServiceStatus struct {
 	// Used to see if the client is trusted. Can be `trusted` or `untrusted`.
 	// Example: untrusted
 	Auth string `json:"auth" yaml:"auth"`
+	// Lists the valid entitlements per resource type in AMS.
+	// Example: {"server": [{"description": "Grants access to view server config", "entitlement_name": "can_view_config"}] }
+	AuthPermissions map[string][]map[string]string `json:"auth_permissions" yaml:"auth_permissions"`
 	// Authentication method used for the requests.
 	// Example: 2waySSL
 	AuthMethods []string `json:"auth_methods" yaml:"auth_methods"`

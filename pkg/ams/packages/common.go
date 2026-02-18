@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -102,7 +101,7 @@ func CreateTempPackage(sources []string, packageType PackageType) (string, error
 	if err != nil {
 		return "", err
 	}
-	outputDir, err := ioutil.TempDir("", "app")
+	outputDir, err := os.MkdirTemp("", "app")
 	if err != nil {
 		return "", err
 	}

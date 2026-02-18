@@ -208,6 +208,9 @@ type Node struct {
 	GPUs []NodeGPU `json:"gpus" yaml:"gpus"`
 	// VPU information for the node
 	VPUs []NodeVPU `json:"vpus" yaml:"vpus"`
+	// Entitlements available to the user for this node
+	// Example: ["can_view", "can_edit", "can_delete"]
+	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
 
 	// DEPRECATED Flag in favour of `unschedulable` flag
 	// Example: false
