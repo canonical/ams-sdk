@@ -27,8 +27,10 @@ jobs:
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG_NAME: ${{ inputs.tag_name }}
+        TARGET: ${{ inputs.target_commitish || github.ref }}
       run: |
-        gh release create "${{ inputs.tag_name }}" \
-          --target "${{ inputs.target_commitish || github.ref }}" \
-          --title "${{ inputs.tag_name }}" \
-          --notes "See https://documentation.ubuntu.com/anbox-cloud/reference/release-notes/${{ inputs.tag_name }}/ for more information."
+        gh release create "${TAG_NAME}" \
+          --target "${TARGET}" \
+          --title "${TAG_NAME}" \
+          --notes "See https://documentation.ubuntu.com/anbox-cloud/reference/release-notes/${TAG_NAME}/ for more information."
