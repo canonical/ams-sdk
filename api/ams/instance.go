@@ -220,6 +220,10 @@ type Instance struct {
 	// instance has not been created from an image.
 	// Example: cilshrmnfpfec9b1kte0
 	ImageID string `json:"image_id" yaml:"image_id"`
+	// ImageName is the name of the image the instance is created from. Empty if the
+	// instance has not been created from an image.
+	// Example: my-image
+	ImageName string `json:"image_name" yaml:"image_name"`
 	// ImageVersion is the version of the image the instance is created from. Empty if the
 	// instance has not been created from an image.
 	// Example: 0
@@ -306,13 +310,15 @@ func GetInstanceFilters() []string {
 		"app_version",
 		"image_id",
 		"image_version",
+		"image_name",
 		"app_name",
 		"tags",
 	}
 }
 
-// InstancesPost represents the fields required to launch a new instance for
-// a specific application
+// InstancesPost represents the fields required to launch a new instance.
+// It supports creating instances from an application, an image, or by
+// copying an existing instance (via the 'source' field).
 //
 // swagger:model
 type InstancesPost struct {
@@ -415,15 +421,18 @@ type InstancesPost struct {
 	// Do not start the instance after creation.
 	NoStart bool `json:"no_start,omitempty" yaml:"no_start,omitempty"`
 
+	// Source specifies an existing resource to use as the origin for this new instance.
 	Source InstanceSource `json:"source,omitempty" yaml:"source,omitempty"`
 }
 
-// InstanceSource represents the source for creating a new instance.
+// InstanceSource represents the source for creating a new instance (e.g., for instance copy).
 //
 // swagger:model
 type InstanceSource struct {
 	// Type of the source resource used for creation. Possible values are: instance
+	// Set this to "instance" to copy an existing instance.
 	// Example: instance
+	// Enum: instance
 	Type SourceType `json:"type" yaml:"type"`
 	// ID of the source resource.
 	// Example: cilsreunfpfec9b1ktg0
