@@ -95,6 +95,14 @@ type ImageVersion struct {
 	ErrorMessage string `json:"error_message,omitempty" yaml:"error_message,omitempty"`
 }
 
+const (
+	// ImageVariantUnknown represents an image variant is unknown.
+	ImageVariantUnknown string = "unknown"
+	// ImageVariantEuphotic is the variant used for euphotic-based images. Creating
+	// applications from or using addons with such images is not allowed.
+	ImageVariantEuphotic string = "euphotic"
+)
+
 // ImageType specifies the type of an image
 type ImageType string
 
@@ -144,6 +152,9 @@ type Image struct {
 	Type ImageType `json:"type" yaml:"type"`
 	// Variant of the image. Possible values are: android, aaos, generic, unknown
 	Variant string `json:"variant" yaml:"variant"`
+	// Capabilities of the image
+	// Example: ["gpu","camera"]
+	Capabilities []string `json:"capabilities,omitempty" yaml:"capabilities,omitempty"`
 	// List of entitlements the user has for this image
 	// Example: ["can_view","can_edit"]
 	Entitlements []string `json:"entitlements,omitempty" yaml:"entitlements,omitempty"`
