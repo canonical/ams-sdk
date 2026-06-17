@@ -34,7 +34,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 	"unicode"
 	"unsafe"
 
@@ -63,14 +62,6 @@ func VarPath(path ...string) string {
 	varPath := filepath.Join(items...)
 	os.MkdirAll(filepath.Dir(varPath), 0755)
 	return varPath
-}
-
-// GetOwnerMode retrieves the file mode and owner of a given file object
-func GetOwnerMode(fInfo os.FileInfo) (os.FileMode, int, int) {
-	mode := fInfo.Mode()
-	uid := int(fInfo.Sys().(*syscall.Stat_t).Uid)
-	gid := int(fInfo.Sys().(*syscall.Stat_t).Gid)
-	return mode, uid, gid
 }
 
 // FileCopy copies a file, overwriting the target if it exists.
@@ -459,18 +450,6 @@ func RandomCryptoString() (string, error) {
 	}
 
 	return hex.EncodeToString(buf), nil
-}
-
-// SetSize sets the size of the PTY connected with the given file descriptor
-func SetSize(fd int, width int, height int) (err error) {
-	var dimensions [4]uint16
-	dimensions[0] = uint16(height)
-	dimensions[1] = uint16(width)
-
-	if _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(fd), uintptr(syscall.TIOCSWINSZ), uintptr(unsafe.Pointer(&dimensions)), 0, 0, 0); err != 0 {
-		return err
-	}
-	return nil
 }
 
 // GenerateFingerprintForFile generates a fingerprint (sha256) for the given file

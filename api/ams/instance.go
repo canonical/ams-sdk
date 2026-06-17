@@ -116,6 +116,18 @@ const (
 	InstanceTypeVM InstanceType = "vm"
 )
 
+// ToImageType converts instance type to image type
+func (t InstanceType) ToImageType() ImageType {
+	switch t {
+	case InstanceTypeContainer:
+		return ImageTypeContainer
+	case InstanceTypeVM:
+		return ImageTypeVM
+	default:
+		return ImageTypeAny
+	}
+}
+
 // SourceType describes the source type of an instance
 type SourceType string
 
@@ -228,6 +240,10 @@ type Instance struct {
 	// instance has not been created from an image.
 	// Example: 0
 	ImageVersion int `json:"image_version" yaml:"image_version"`
+	// ImageVariant is the variant of the image the instance is created from. Empty if the
+	// instance has not been created from an image.
+	// Example: aaos
+	ImageVariant string `json:"image_variant" yaml:"image_variant"`
 	// CreatedAt specifies the time at which the instance was created
 	// Example: 1689604498
 	CreatedAt int64 `json:"created_at" yaml:"created_at"`
@@ -269,7 +285,9 @@ type Instance struct {
 		DevMode bool `json:"devmode,omitempty" yaml:"devmode,omitempty"`
 		// EnableStreaming specifies if streaming should be enabled for the instance or not
 		EnableStreaming bool `json:"enable_streaming,omitempty" yaml:"enable_streaming,omitempty"`
-		Display         struct {
+		// Feature flags to enable for the instance.
+		Features string `json:"features,omitempty" yaml:"features,omitempty"`
+		Display  struct {
 			// Width is the width of the virtual display
 			Width int `json:"width" yaml:"width"`
 			// Height is the height of the virtual display
