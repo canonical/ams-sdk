@@ -21,6 +21,11 @@ package constants
 const (
 	// DefaultNetworkName is the default LXD network name AMS creates
 	DefaultNetworkName = "amsbr0"
+	// DefaultProfileName is the default LXD profile name AMS creates
+	DefaultProfileName = "ams0"
+	// DefaultProjectName is the name of the built-in, immutable project that every
+	// legacy/pre-projects deployment and instance resolves to.
+	DefaultProjectName = "default"
 	// AdminGroupName is the name of the default admin group
 	AdminGroupName = "admin"
 	// AdminGroupDescription is the description of the default admin group
