@@ -97,6 +97,9 @@ type NodeGPU struct {
 	// PCI Bus Address used by the GPU
 	// Example: D129
 	RenderName string `json:"render_name" yaml:"render_name"`
+	// UUID is the Nvidia GPU UUID, used as the CDI device id. Empty for non-Nvidia GPUs.
+	// Example: GPU-6ddadebd-dafe-2db9-f10f-125719770fd3
+	UUID string `json:"uuid,omitempty" yaml:"uuid,omitempty"`
 	// Number of the GPU slots available
 	// Example: 20
 	Slots int `json:"slots" yaml:"slots"`

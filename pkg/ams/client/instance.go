@@ -126,7 +126,7 @@ func (c *clientImpl) LaunchInstance(details *api.InstancesPost, noWait bool) (cl
 		d.Config.DevMode = details.Config.DevMode
 		d.NoStart = details.NoStart
 
-		if len(d.ImageID) > 0 && (d.CPUs == nil || d.Memory == nil || d.DiskSize == nil) {
+		if len(d.ImageID) > 0 && (d.CPUs == nil || d.Memory == nil) {
 			return nil, errs.NewInvalidArgument("resources")
 		}
 

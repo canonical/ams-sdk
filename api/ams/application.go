@@ -277,6 +277,8 @@ type ApplicationWatchdog struct {
 	AllowedPackages []string `json:"allowed-packages,omitempty" yaml:"allowed-packages,omitempty"`
 }
 
+var androidPackageNamePattern = regexp.MustCompile(constants.AndroidPackageNamePattern)
+
 // ValidateAllowedPackages checks the value for given allowed packages
 func (a ApplicationWatchdog) ValidateAllowedPackages() error {
 	if len(a.AllowedPackages) > 0 {
@@ -286,7 +288,7 @@ func (a ApplicationWatchdog) ValidateAllowedPackages() error {
 			}
 		} else {
 			for _, allowPackage := range a.AllowedPackages {
-				if match, _ := regexp.MatchString(constants.AndroidPackageNamePattern, allowPackage); !match {
+				if !androidPackageNamePattern.MatchString(allowPackage) {
 					return errors.NewInvalidArgument(fmt.Sprintf("'allowed-packages': %s", allowPackage))
 				}
 			}

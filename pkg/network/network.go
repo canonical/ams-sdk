@@ -27,11 +27,31 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/netip"
 	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+// SubnetContains checks if a smaller subnet is a part of a larger subnet pool
+func SubnetContains(pool, subnet string) (bool, error) {
+	p, err := netip.ParsePrefix(pool)
+	if err != nil {
+		return false, err
+	}
+	s, err := netip.ParsePrefix(subnet)
+	if err != nil {
+		return false, err
+	}
+	// subnet cannot be contained in pool if subnet is less specific.
+	if s.Bits() < p.Bits() {
+		return false, nil
+	}
+
+	// Check whether subnet's network address falls inside pool.
+	return p.Contains(s.Addr()), nil
+}
 
 // RFC3493Dialer dialer
 func RFC3493Dialer(network, address string) (net.Conn, error) {

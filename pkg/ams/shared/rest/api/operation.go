@@ -69,6 +69,15 @@ operation:
     err:
       type: string
       description: The error string if the operation failed
+    server_address:
+      type: string
+      format: ipv4
+      description: The address of the server where the operation ran
+      example: 10.0.0.1
+    requestor:
+      type: string
+      description: The identity that requested the operation
+      example: dbfmti00520j4f90fp0g
 `
 
 // Operation represents a background operation
@@ -116,4 +125,7 @@ type Operation struct {
 	// swagger:strfmt ipv4
 	// Example: 10.0.0.1
 	ServerAddress string `json:"server_address,omitempty" yaml:"server_address,omitempty"`
+	// The identity that requested the operation
+	// Example: dbfmti00520j4f90fp0g
+	Requestor string `json:"requestor,omitempty" yaml:"requestor,omitempty"`
 }

@@ -70,6 +70,20 @@ func (s InstanceStatus) String() string {
 	return "unknown"
 }
 
+// DisplaySpec specifies the attributes of a virtual display for an instance.
+//
+// swagger:model
+type DisplaySpec struct {
+	// Width is the width of the virtual display in pixels
+	Width int `json:"width" yaml:"width"`
+	// Height is the height of the virtual display in pixels
+	Height int `json:"height" yaml:"height"`
+	// FPS is the frame rate of the virtual display
+	FPS int `json:"fps,omitempty" yaml:"fps,omitempty"`
+	// Density is the pixel density of the virtual display
+	Density int `json:"density,omitempty" yaml:"density,omitempty"`
+}
+
 // InstanceService describes a single service the instance exposes to the outside world.
 //
 // While NetworkServiceSpec defines what the user requests, InstanceService is what is actually
@@ -216,6 +230,9 @@ type Instance struct {
 	// Node the instance is running on
 	// Example: lxd0
 	Node string `json:"node" yaml:"node"`
+	// Project the instance is attached to. Empty means the "default" project.
+	// Example: team-a
+	Project string `json:"project" yaml:"project"`
 	// AppID is the ID of the application the instance is created from. Empty if the
 	// instance has not been created from an application.
 	// Example: cilsiomnfpfec9b1kteg
@@ -287,16 +304,12 @@ type Instance struct {
 		EnableStreaming bool `json:"enable_streaming,omitempty" yaml:"enable_streaming,omitempty"`
 		// Feature flags to enable for the instance.
 		Features string `json:"features,omitempty" yaml:"features,omitempty"`
-		Display  struct {
-			// Width is the width of the virtual display
-			Width int `json:"width" yaml:"width"`
-			// Height is the height of the virtual display
-			Height int `json:"height" yaml:"height"`
-			// FPS is the frame rate of the virtual display
-			FPS int `json:"fps" yaml:"fps"`
-			// Density is the piel density of the virtual display
-			Density int `json:"density" yaml:"density"`
-		} `json:"display,omitempty" yaml:"display,omitempty"`
+		// Display specifies the configuration of the virtual display of the instance.
+		// Deprecated: use Displays instead. If both are set, Displays takes precedence.
+		Display DisplaySpec `json:"display,omitempty" yaml:"display,omitempty"`
+		// Displays specifies the configuration for multiple virtual displays.
+		Displays []DisplaySpec `json:"displays,omitempty" yaml:"displays,omitempty"`
+		// Security settings for the instance
 		Security struct {
 			DeleteProtected bool `json:"delete_protected" yaml:"delete_protected"`
 		} `json:"security" yaml:"security"`
@@ -324,6 +337,7 @@ func GetInstanceFilters() []string {
 		"type",
 		"base",
 		"node",
+		"project",
 		"app_id",
 		"app_version",
 		"image_id",
@@ -360,6 +374,9 @@ type InstancesPost struct {
 	// Node to start the instance on. If empty node will be automatically selected.
 	// Example: lxd0
 	Node string `json:"node" yaml:"node"`
+	// Project to attach the instance to. Empty means the "default" project.
+	// Example: team-a
+	Project string `json:"project,omitempty" yaml:"project,omitempty"`
 	// User data to pass to the instance.
 	// Example: {\"key\":\"value\"}
 	Userdata *string `json:"user_data,omitempty" yaml:"user_data,omitempty"`
@@ -419,17 +436,13 @@ type InstancesPost struct {
 		DevMode bool `json:"devmode,omitempty" yaml:"devmode,omitempty"`
 		// EnableStreaming specifies if streaming should be enabled for the instance or not
 		EnableStreaming bool `json:"enable_streaming,omitempty" yaml:"enable_streaming,omitempty"`
-		// Display specifies the configuration of the virutal display of the instance
-		Display struct {
-			// Width is the width of the virtual display
-			Width int `json:"width" yaml:"width"`
-			// Height is the height of the virtual display
-			Height int `json:"height" yaml:"height"`
-			// FPS is the frame rate of the virtual display
-			FPS int `json:"fps" yaml:"fps"`
-			// Density is the piel density of the virtual display
-			Density int `json:"density" yaml:"density"`
-		} `json:"display,omitempty" yaml:"display,omitempty"`
+		// Display specifies the configuration of the virtual display of the instance.
+		// Deprecated: use Displays instead. If both are set, Displays takes precedence.
+		Display DisplaySpec `json:"display,omitempty" yaml:"display,omitempty"`
+		// Displays specifies the configuration for multiple virtual displays.
+		// The first element represents the primary display (ID 0).
+		// A maximum of 4 displays is supported.
+		Displays []DisplaySpec `json:"displays,omitempty" yaml:"displays,omitempty"`
 		// Security settings for the instance
 		Security struct {
 			// Delete protection for the instance

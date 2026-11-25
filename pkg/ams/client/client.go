@@ -44,6 +44,13 @@ type Client interface {
 	RetrieveNodeByName(name string) (*api.Node, string, error)
 	UpdateNode(name string, details *api.NodePatch) (restclient.Operation, error)
 
+	// Projects
+	CreateProject(details *api.ProjectsPost) (restclient.Operation, error)
+	ListProjectsWithFilters(filters []string) ([]api.Project, error)
+	RetrieveProjectByName(name string) (*api.Project, string, error)
+	UpdateProject(name string, details *api.ProjectsPatch, etag string) (restclient.Operation, error)
+	DeleteProject(name string, force bool) (restclient.Operation, error)
+
 	// Certificates
 	ListCertificates() ([]restapi.Certificate, error)
 	AddCertificate(details *restapi.CertificatesPost) (*restapi.Response, error)
